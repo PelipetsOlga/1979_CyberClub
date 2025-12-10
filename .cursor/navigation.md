@@ -1,368 +1,280 @@
 ````markdown
 # navigation.md
 
-Navigation plan for **1w Cyber Club** Android app (Jetpack Compose + Navigation).
+Навигация для приложения **1w Cyber Club** (Jetpack Compose + Navigation).
 
-The app has two main flows:
+## 1. Общая идея
 
-1. **Launch / Onboarding flow** – shown only on first app launch.
-2. **Main app flow** – Home + all feature screens with a mini navigation drawer.
+Есть **два уровня навигации**:
+
+1. **Внешний NavHost** (`rootNavController`) — управляет большими экранами / флоу:
+   - Splash → Onboarding → Home → HomeWrapper → Cart → OrderConfirmation
+2. **Внутренний NavHost** (`homeNavController`) — живёт внутри `HomeWrapperScreen`  
+   и управляет контентом под боковым мини-меню (mini drawer).
 
 ---
 
-## 1. Navigation graph overview
+## 2. Внешний NavHost (rootNavController)
 
-Top-level NavHost:
+**Start destination**: `SplashScreen`
 
-- **Start destination:** `splash`
-- If onboarding not completed → `onboarding/1`
-- If onboarding completed → `home`
+Список экранов внешнего графа:
 
-```mermaid
-flowchart TD
-    splash --> onboarding1
-    splash --> home
+1. `SplashScreen`
+2. `OnboardingScreen`
+3. `HomeScreen`
+4. `HomeWrapperScreen`
+5. `CartScreen`
+6. `OrderConfirmationScreen`
 
-    subgraph Onboarding
-      onboarding1 --> onboarding2
-      onboarding2 --> onboarding3
-      onboarding3 --> onboarding4
-      onboarding4 --> home
-    end
+### 2.1. SplashScreen
 
-    home --> menu
-    home --> cart
-    home --> schedule
-    home --> reservationForm
-    home --> clubInfo
-    home --> support
-    home --> liveStatus
-    home --> history
+- Решает, куда перейти дальше.
+
+Логика:
+
+- Если `onboardingCompleted == false` → `OnboardingScreen`
+- Иначе → `HomeScreen`
+
+Навигация:
+
+```kotlin
+if (!onboardingCompleted) {
+    rootNavController.navigate("onboarding") {
+        popUpTo("splash") { inclusive = true }
+    }
+} else {
+    rootNavController.navigate("home") {
+        popUpTo("splash") { inclusive = true }
+    }
+}
 ````
 
 ---
 
-## 2. Screen list & routes
+### 2.2. OnboardingScreen (pager на 4 страницы)
 
-| Screen                        | Route                      | Notes / Params                                               |
-| ----------------------------- | -------------------------- | ------------------------------------------------------------ |
-| Splash                        | `splash`                   | Decides where to go next based on onboarding flag            |
-| Onboarding step 1–4           | `onboarding/{step}`        | `step` = 1, 2, 3, 4                                          |
-| Home                          | `home`                     | Main entry after onboarding                                  |
-| Product Catalog / Gaming Time | `menu`                     | Filtered by top chips (All, PC, Console, Drinks, etc.)       |
-| Cart                          | `cart`                     | Shows cart items, empty/non-empty states                     |
-| Order Confirmed (QR)          | `order/confirm/{orderId}`  | Displays QR + order summary                                  |
-| Reservation Form              | `reservation/form`         | User enters name, phone, zone, seat, date, time              |
-| Reservation Completed (QR)    | `reservation/confirm/{id}` | Displays QR + reservation summary                            |
-| Esports Schedule              | `schedule`                 | List or error state                                          |
-| Support                       | `support`                  | Contacts: phone, Telegram, email                             |
-| Live Club Status              | `liveStatus`               | Availability + “Reserve Now”                                 |
-| Club Info & Rules             | `clubInfo`                 | Accordions with text sections                                |
-| History                       | `history?tab={tab}`        | `tab` = `reservations` or `orders` (default: `reservations`) |
+* Один composable с **Pager** на 4 слайда.
+* Кнопка **Get Started** на последнем слайде:
 
----
-
-## 3. Launch & onboarding flow
-
-### 3.1 Splash (`splash`)
-
-* **On enter**:
-
-    * Reads `onboardingCompleted` flag from storage.
-* **Navigation:**
-
-    * If `onboardingCompleted == false` → `onboarding/1`
-    * Else → `home`
-* No back navigation (user cannot return to Splash).
-
-### 3.2 Onboarding (`onboarding/{step}`)
-
-* Steps: 1 → 2 → 3 → 4.
-* Buttons:
-
-    * Steps 1–3: **Next** → `onboarding/{step+1}`
-    * Step 4: **Get Started**:
-
-        * Saves `onboardingCompleted = true`
-        * Navigates to `home`, clearing onboarding from back stack.
-
-Recommended navigation call from step 4:
+    * сохраняет `onboardingCompleted = true`
+    * ведёт на `HomeScreen` и очищает back stack.
 
 ```kotlin
-navController.navigate("home") {
+rootNavController.navigate("home") {
     popUpTo("splash") { inclusive = true }
 }
 ```
 
 ---
 
-## 4. Main app navigation (after onboarding)
+### 2.3. HomeScreen
 
-### 4.1 Home (`home`)
+Это экран «Hello! What would you like to do today?».
 
-Home is the central hub.
+Кнопки на HomeScreen используют **rootNavController**:
 
-Cards / actions:
+* **Gaming Time** → `HomeWrapperScreen` c начальными inner-настройками:
 
-* **Gaming Time** → `menu`
-* **Cart** → `cart`
-* **Match Schedule** → `schedule`
-* **Reserve Seat** → `reservation/form`
-* **Club Info** → `clubInfo`
-* **Support** → `support`
-* **(Bottom-right QR button)** → can be wired later (e.g. “last order QR” or scanner).
+    * открыть `HomeWrapperScreen`, а внутри `homeNavController` выбрать `GamingTime`.
+* **Cart** → `CartScreen`
+* **Match Schedule** → `HomeWrapperScreen` + inner `MatchSchedule`
+* **Reserve Seat** → `HomeWrapperScreen` + inner `ReserveSeat`
+* **Club Info** → `HomeWrapperScreen` + inner `ClubInfo`
+* **Support** → `HomeWrapperScreen` + inner `Support`
 
-Home is also a destination of many “Back to Home” buttons.
+Пример (идея):
+
+```kotlin
+fun openWrapper(startDestination: HomeDestination) {
+    rootNavController.navigate("home_wrapper/${startDestination.name}")
+}
+```
 
 ---
 
-## 5. Product catalog & cart
+### 2.4. HomeWrapperScreen
 
-### 5.1 Product Catalog / Gaming Time (`menu`)
+`HomeWrapperScreen` содержит:
 
-* Top filters (All / PC Time / Console Time / Drinks / Snacks) – **local state only**, no navigation.
-* “Add to cart” buttons modify cart state only.
-* Header:
+* боковое мини-меню (mini drawer / navigation rail)
+* внутренний `NavHost` c `homeNavController`
 
-    * Left: **menu icon** → opens mini drawer.
-    * Right: **cart icon with badge** → `cart`.
+Снаружи `HomeWrapperScreen` воспринимается как **один экран**.
 
-**Navigation:**
+Навигация внешним контроллером:
 
-* From Home: `home` → `menu`
-* From Drawer: *Gaming Time* → `menu`
-* From Cart or other screens: `navController.navigate("menu")` as needed.
+* Из `HomeScreen`:
 
-### 5.2 Cart (`cart`)
+    * `home` → `home_wrapper/GAMING_TIME`
+    * `home` → `home_wrapper/MATCH_SCHEDULE`
+    * и т.д. (в зависимости от кнопки)
+* По кнопке Back (системная) → `rootNavController.popBackStack()` → обычно вернёт на `HomeScreen`.
 
-States: empty / with items.
+---
 
-* Header:
+### 2.5. CartScreen (внешний)
 
-    * Left: **menu icon** → opens drawer.
-    * Right: **Back** → `navController.popBackStack()`.
-* Buttons:
+Это экран корзины, открываемый **снаружи**:
 
-    * **Confirm Order**:
+* из кнопки **Cart** на `HomeScreen`
+* потенциально из других мест (в будущем).
 
-        * If cart has items: creates order and navigates to `order/confirm/{orderId}`.
-        * If empty: stays on screen (optional toast).
+Контент `CartScreen` может переиспользовать тот же composable, что и inner `Cart` внутри `HomeWrapperScreen`.
 
-**Navigation:**
+Навигация:
 
-* From Home / Drawer / Menu: → `cart`
-* From Cart:
-
-    * **Back** → previous screen (usually `menu` or `home`).
-    * **Confirm Order** → `order/confirm/{orderId}`.
-
-### 5.3 Order Confirmed (QR) (`order/confirm/{orderId}`)
-
-* Shows QR code and order details.
-
-Buttons:
-
-* **Back** (top right) → `navController.popBackStack()` (back to `cart`).
-* **Back to Home** → `home` (pop up to `home`).
-
-Recommended:
+* Back → `popBackStack()` (возврат на `HomeScreen` или предыдущий экран)
+* **Confirm Order** → `OrderConfirmationScreen`
 
 ```kotlin
-navController.navigate("home") {
+rootNavController.navigate("order_confirmation")
+```
+
+---
+
+### 2.6. OrderConfirmationScreen
+
+Экран с QR-кодом и деталями заказа.
+
+Навигация:
+
+* **Back** (в хедере) → `popBackStack()` (назад в CartScreen)
+* **Back to Home** → `HomeScreen` (очистить стек до home)
+
+```kotlin
+rootNavController.navigate("home") {
     popUpTo("home") { inclusive = false }
 }
 ```
 
 ---
 
-## 6. Reservation flow
+## 3. Внутренний NavHost (homeNavController) внутри HomeWrapperScreen
 
-### 6.1 Reservation Form (`reservation/form`)
+Внутри `HomeWrapperScreen` есть второй NavHost:
 
-Entry points:
+**Start destination**: задаётся параметром, с которым мы открыли `HomeWrapperScreen`.
+По умолчанию — `GamingTime`.
 
-* Home → “Reserve Seat”
-* Drawer → “Reserve Seat”
-* Live Status → “Reserve Now”
+Внутренние экраны:
 
-On **Confirm Reservation**:
+4.1. `GamingTime`
+4.2. `Cart`
+4.3. `MatchSchedule`
+4.4. `ReserveSeat`
+4.5. `ClubInfo`
+4.6. `Support`
 
-1. Validate form.
-2. Create reservation.
-3. Navigate to `reservation/confirm/{id}`.
+### 3.1. Mini drawer (левое узкое меню)
 
-Header:
+Mini drawer внутри `HomeWrapperScreen` управляет **homeNavController**.
 
-* Menu icon → drawer.
-* Back → previous screen (usually `home` or `liveStatus`).
+Пункты меню:
 
-### 6.2 Reservation Completed (QR) (`reservation/confirm/{id}`)
+* Gaming Time → `homeNavController.navigate("gaming_time")`
+* Cart → `homeNavController.navigate("cart_inner")`
+* Match Schedule → `homeNavController.navigate("match_schedule")`
+* Reserve Seat → `homeNavController.navigate("reserve_seat")`
+* Club Info → `homeNavController.navigate("club_info")`
+* Support → `homeNavController.navigate("support")`
 
-Buttons:
-
-* **Back** → `navController.popBackStack()` (returns to form).
-* **Back to Home** → `home` (pop up to `home`).
-* Drawer (if enabled) → any main destination.
-
----
-
-## 7. Esports Schedule (`schedule`)
-
-Entry:
-
-* Home → “Match Schedule”.
-* Drawer → “Match Schedule”.
-
-States:
-
-* Loading (not shown in design, but recommended).
-* Error: text “Unable to load matches, try again later.”
-* Content: list of matches.
-
-Header:
-
-* Menu icon → drawer.
-* Optional Back → `navController.popBackStack()` (back to Home).
-
----
-
-## 8. Support (`support`)
-
-Entry:
-
-* Home → “Support”
-* Drawer → “Support”
-
-UI actions (no navigation in NavHost):
-
-* Tap phone → open dialer via `Intent.ACTION_DIAL`.
-* Tap Telegram → open Telegram deep link.
-* Tap email → open mail app.
-
-Header:
-
-* Menu icon → drawer.
-* Back → previous screen (usually `home`).
-
----
-
-## 9. Live Club Status (`liveStatus`)
-
-Entry:
-
-* Drawer → “Live Status”
-
-Buttons:
-
-* **Reserve Now** → `reservation/form`.
-
-Header:
-
-* Menu icon → drawer.
-* Back → previous screen (usually `home`).
-
----
-
-## 10. Club Info & Rules (`clubInfo`)
-
-Entry:
-
-* Home → “Club Info”
-* Drawer → “Club Info”
-
-UI:
-
-* Accordions expand/collapse **inside the same screen** (no extra navigation).
-* Button **Back to Home** → `home`.
-* Header menu icon → drawer.
-
----
-
-## 11. History (`history?tab={tab}`)
-
-Entry:
-
-* Drawer → “History”
-
-Tabs:
-
-* `tab = reservations` – Reservation history (default).
-* `tab = orders` – Order history.
-
-Routes examples:
-
-* `history` → treated as `history?tab=reservations`
-* `history?tab=orders`
-
-Buttons:
-
-* Tab click → `tab` in state only (no navigation call required, but you may re-navigate to keep route in sync).
-* Back → previous screen (usually `home`).
-
----
-
-## 12. Mini Navigation Drawer behaviour
-
-The app uses a **mini navigation drawer / navigation rail** that slides from the left when the user taps the menu icon.
-
-Available on screens:
-
-* `home`
-* `menu`
-* `cart`
-* `order/confirm/{id}`
-* `reservation/form`
-* `reservation/confirm/{id}`
-* `schedule`
-* `support`
-* `liveStatus`
-* `clubInfo`
-* `history`
-
-Drawer items → routes:
-
-* Home → `home`
-* Gaming Time → `menu`
-* Cart → `cart`
-* Match Schedule → `schedule`
-* Reserve Seat → `reservation/form`
-* Club Info → `clubInfo`
-* Support → `support`
-* Live Status → `liveStatus`
-* History → `history`
-
-Implementation hint (Compose):
-
-* Use `ModalNavigationDrawer` or custom panel with a `NavigationRail`-like design.
-* Drawer selection should **replace** current screen, not stack duplicates:
+Здесь используется обычный `navigateSingleTop`, чтобы не плодить копии:
 
 ```kotlin
-fun NavController.navigateSingleTopTo(route: String) {
-    navigate(route) {
-        launchSingleTop = true
-        restoreState = true
-        popUpTo(graph.startDestinationId) {
-            saveState = true
-        }
-    }
+homeNavController.navigate(route) {
+    launchSingleTop = true
 }
 ```
 
 ---
 
-## 13. Back navigation rules (summary)
+### 3.2. Внутренние экраны и связь с внешним NavHost
 
-* From **Order Confirmed** → Back = Cart, “Back to Home” = Home.
-* From **Reservation Confirmed** → Back = Reservation Form, “Back to Home” = Home.
-* From **Menu, Cart, Schedule, Support, Live Status, Club Info, History**:
+#### 4.1 Gaming Time
 
-    * Back → previous screen (usually Home).
-* From **Home**:
+* Экран каталога (PC/Console/Drinks/Snacks)
+* Тап по иконке корзины в хедере:
 
-    * Back → exit app.
-* Onboarding -> Home clears Splash/Onboarding from back stack.
+    * вариант 1: `homeNavController.navigate("cart_inner")`
+    * вариант 2: `rootNavController.navigate("cart")` (открыть внешний CartScreen)
+
+#### 4.2 Cart (inner)
+
+* То же содержимое, что и внешний CartScreen, но управляется `homeNavController`.
+* По кнопке **Confirm Order**:
+
+    * Создаём заказ и переходим во **внешний** флоу:
+
+      ```kotlin
+      rootNavController.navigate("order_confirmation")
+      ```
+
+#### 4.3 Match Schedule
+
+* Загружает расписание матчей.
+* Ошибка / список — внутри одного экрана.
+* Back-навигация:
+
+    * системный Back → `homeNavController.popBackStack()` (если нужно) или сразу `rootNavController.popBackStack()` (возврат на HomeScreen, если `HomeWrapperScreen` был открыт из Home).
+
+#### 4.4 Reserve Seat
+
+* Форма бронирования (имя, телефон, зона, место, дата, время).
+* По Confirm Reservation:
+
+    * создаём бронирование
+    * можем либо:
+
+        * показать QR внутри wrapper (доп. inner-экран), либо
+        * открыть внешний `OrderConfirmationScreen` с типом "reservation" (если переиспользуем UI).
+
+#### 4.5 Club Info
+
+* Аккордеоны с текстом правил.
+* Кнопка **Back to Home**:
+
+    * лучше использовать внешний контроллер:
+
+      ```kotlin
+      rootNavController.navigate("home") {
+          popUpTo("home") { inclusive = false }
+      }
+      ```
+
+#### 4.6 Support
+
+* Контакты (телефон, Telegram, email).
+* Никакой навигации внутри NavHost, только интенты системы (dial / mail / deep link).
 
 ---
+
+## 4. Резюме навигационных потоков
+
+1. **Первый запуск**
+   `SplashScreen` → `OnboardingScreen` (pager 4 страницы) → `HomeScreen`.
+
+2. **Повторный запуск**
+   `SplashScreen` → `HomeScreen`.
+
+3. **Из HomeScreen в фичи через HomeWrapper:**
+
+    * Gaming Time → `HomeWrapperScreen` → inner `GamingTime`.
+    * Match Schedule → `HomeWrapperScreen` → inner `MatchSchedule`.
+    * Reserve Seat → `HomeWrapperScreen` → inner `ReserveSeat`.
+    * Club Info → `HomeWrapperScreen` → inner `ClubInfo`.
+    * Support → `HomeWrapperScreen` → inner `Support`.
+
+4. **Корзина и заказ:**
+
+    * Из HomeScreen → `CartScreen` → `OrderConfirmationScreen`.
+    * Из Gaming Time (inner) → inner Cart или внешний CartScreen → `OrderConfirmationScreen`.
+
+5. **Возврат домой:**
+
+    * Из любых внутренних экранов кнопки типа **Back to Home** всегда используют `rootNavController.navigate("home")` с `popUpTo("home")`.
+
+Это и есть фактический план навигации с явным разделением на внешний `rootNavController` и внутренний `homeNavController` внутри `HomeWrapperScreen`.
 
 ```
 ```
