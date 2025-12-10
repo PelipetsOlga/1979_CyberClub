@@ -1,0 +1,28 @@
+package com.application.navigation
+
+/**
+ * Routes for external navigation (rootNavController)
+ */
+sealed class RootRoute(val route: String) {
+    object Splash : RootRoute("splash")
+    object Onboarding : RootRoute("onboarding")
+    object Home : RootRoute("home")
+    object HomeWrapper : RootRoute("home_wrapper/{initialScreen}") {
+        fun createRoute(initialScreen: String) = "home_wrapper/$initialScreen"
+    }
+    object Cart : RootRoute("cart")
+    object OrderConfirmation : RootRoute("order_confirmation")
+}
+
+/**
+ * Routes for internal navigation (homeNavController inside HomeWrapperScreen)
+ */
+sealed class HomeRoute(val route: String) {
+    object GamingTime : HomeRoute("gaming_time")
+    object CartInner : HomeRoute("cart_inner")
+    object MatchSchedule : HomeRoute("match_schedule")
+    object ReserveSeat : HomeRoute("reserve_seat")
+    object ClubInfo : HomeRoute("club_info")
+    object Support : HomeRoute("support")
+}
+
