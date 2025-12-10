@@ -8,6 +8,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.application.ui.theme.colorSplashBackground
+import com.application.ui.theme.colorSplashLoadingActive
+import com.application.ui.theme.colorSplashLoadingTrack
+import com.application.ui.theme.colorWhitePure
 
 @Composable
 fun SplashScreen(
@@ -41,7 +45,7 @@ fun SplashScreen(
 
     Surface(
         modifier = Modifier.fillMaxSize(),
-        color = MaterialTheme.colorScheme.background
+        color = colorSplashBackground
     ) {
         Column(
             modifier = Modifier.fillMaxSize(),
@@ -49,12 +53,18 @@ fun SplashScreen(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "SplashScreen",
-                style = MaterialTheme.typography.headlineLarge
+                text = "Loading...",
+                color = colorWhitePure,
+                style = MaterialTheme.typography.bodyLarge
             )
-            Spacer(modifier = Modifier.height(16.dp))
+            Spacer(modifier = Modifier.height(24.dp))
             if (state.isLoading) {
-                CircularProgressIndicator()
+                CircularProgressIndicator(
+                    modifier = Modifier.size(64.dp),
+                    color = colorSplashLoadingActive,
+                    trackColor = colorSplashLoadingTrack,
+                    strokeWidth = 4.dp
+                )
             }
         }
     }
