@@ -22,15 +22,17 @@ import com.application.ui.feature_home_wrapper.HomeWrapperScreen
 import com.application.ui.feature_onboarding.OnboardingScreen
 import com.application.ui.feature_order_confirmation.OrderConfirmationScreen
 import com.application.ui.feature_splash.SplashScreen
+import com.application.ui.theme.AppTheme
+import com.application.ui.utils.setUpEdgeToEdgeMode
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        enableEdgeToEdge()
+        setUpEdgeToEdgeMode()
         
         setContent {
-            MaterialTheme {
+            AppTheme {
                 Surface(
                     modifier = Modifier.fillMaxSize(),
                     color = MaterialTheme.colorScheme.background
