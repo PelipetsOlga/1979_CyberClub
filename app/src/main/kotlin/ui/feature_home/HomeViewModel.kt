@@ -4,6 +4,8 @@ import com.application.MviViewModel
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class HomeState(
     val isLoading: Boolean = false
@@ -23,7 +25,8 @@ sealed class HomeEffect : UiEffect {
     object NavigateToCart : HomeEffect()
 }
 
-class HomeViewModel : MviViewModel<HomeEvent, HomeState, HomeEffect>() {
+@HiltViewModel
+class HomeViewModel @Inject constructor() : MviViewModel<HomeEvent, HomeState, HomeEffect>() {
     override fun createInitialState(): HomeState = HomeState()
 
     override fun handleEvent(event: HomeEvent) {

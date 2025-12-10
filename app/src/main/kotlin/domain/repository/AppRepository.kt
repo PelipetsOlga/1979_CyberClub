@@ -1,4 +1,4 @@
-package com.application.com.application.domain.com.application.domain
+package com.application.domain.repository
 
 import kotlinx.coroutines.flow.Flow
 
@@ -7,5 +7,3 @@ interface AppRepository {
     suspend fun isFirstLaunch(): Boolean
     suspend fun setFirstLaunchCompleted()
 }
-
-

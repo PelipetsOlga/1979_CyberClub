@@ -8,12 +8,13 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.ui.Modifier
-import androidx.lifecycle.viewmodel.compose.viewModel
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import dagger.hilt.android.AndroidEntryPoint
 import com.application.navigation.RootRoute
 import com.application.ui.feature_cart.CartScreen
 import com.application.ui.feature_home.HomeScreen
@@ -22,6 +23,7 @@ import com.application.ui.feature_onboarding.OnboardingScreen
 import com.application.ui.feature_order_confirmation.OrderConfirmationScreen
 import com.application.ui.feature_splash.SplashScreen
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -41,21 +43,21 @@ class MainActivity : ComponentActivity() {
                     ) {
                         composable(RootRoute.Splash.route) {
                             SplashScreen(
-                                viewModel = viewModel(),
+                                viewModel = hiltViewModel(),
                                 navController = rootNavController
                             )
                         }
                         
                         composable(RootRoute.Onboarding.route) {
                             OnboardingScreen(
-                                viewModel = viewModel(),
+                                viewModel = hiltViewModel(),
                                 navController = rootNavController
                             )
                         }
                         
                         composable(RootRoute.Home.route) {
                             HomeScreen(
-                                viewModel = viewModel(),
+                                viewModel = hiltViewModel(),
                                 navController = rootNavController
                             )
                         }
@@ -73,20 +75,20 @@ class MainActivity : ComponentActivity() {
                             HomeWrapperScreen(
                                 initialScreen = initialScreen,
                                 rootNavController = rootNavController,
-                                viewModel = viewModel()
+                                viewModel = hiltViewModel()
                             )
                         }
                         
                         composable(RootRoute.Cart.route) {
                             CartScreen(
-                                viewModel = viewModel(),
+                                viewModel = hiltViewModel(),
                                 navController = rootNavController
                             )
                         }
                         
                         composable(RootRoute.OrderConfirmation.route) {
                             OrderConfirmationScreen(
-                                viewModel = viewModel(),
+                                viewModel = hiltViewModel(),
                                 navController = rootNavController
                             )
                         }

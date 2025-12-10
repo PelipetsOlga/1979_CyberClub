@@ -10,6 +10,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.application.navigation.RootRoute
 
 @Composable
 fun OnboardingScreen(
@@ -28,8 +29,8 @@ fun OnboardingScreen(
         effect?.let {
             when (it) {
                 is OnboardingEffect.NavigateToHome -> {
-                    navController.navigate("home") {
-                        popUpTo("splash") { inclusive = true }
+                    navController.navigate(RootRoute.Home.route) {
+                        popUpTo(RootRoute.Splash.route) { inclusive = true }
                     }
                 }
             }

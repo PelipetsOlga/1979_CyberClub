@@ -4,6 +4,8 @@ import com.application.MviViewModel
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class OrderConfirmationState(
     val orderId: String = "",
@@ -20,7 +22,8 @@ sealed class OrderConfirmationEffect : UiEffect {
     object NavigateBack : OrderConfirmationEffect()
 }
 
-class OrderConfirmationViewModel : MviViewModel<OrderConfirmationEvent, OrderConfirmationState, OrderConfirmationEffect>() {
+@HiltViewModel
+class OrderConfirmationViewModel @Inject constructor() : MviViewModel<OrderConfirmationEvent, OrderConfirmationState, OrderConfirmationEffect>() {
     override fun createInitialState(): OrderConfirmationState = OrderConfirmationState()
 
     override fun handleEvent(event: OrderConfirmationEvent) {

@@ -9,11 +9,13 @@ import org.yaml.snakeyaml.Yaml
         import org.gradle.internal.os.OperatingSystem
         import java.io.File
 
-        plugins {
-            alias(libs.plugins.android.application)
-            alias(libs.plugins.kotlin.android)
-            alias(libs.plugins.kotlin.compose)
-        }
+plugins {
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
+    alias(libs.plugins.kotlin.compose)
+    id("com.google.dagger.hilt.android") version "2.51.1"
+    id("kotlin-kapt")
+}
 
 // Load configuration from YAML file
 @Suppress("UNCHECKED_CAST")
@@ -114,6 +116,9 @@ android {
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17.toString()
     }
+    kapt {
+        correctErrorTypes = true
+    }
     buildFeatures {
         compose = true
         buildConfig = true
@@ -142,8 +147,22 @@ dependencies {
     implementation(libs.androidx.material3)
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.lifecycle.viewmodel.compose)
+    
+    // DataStore
+    implementation("androidx.datastore:datastore-preferences:1.1.1")
+    
+    // Hilt
+    implementation("com.google.dagger:hilt-android:2.51.1")
+    kapt("com.google.dagger:hilt-compiler:2.51.1")
+    implementation("androidx.hilt:hilt-navigation-compose:1.2.0")
+    
     debugImplementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.test.manifest)
+}
+
+// Workaround for Hilt aggregate deps task compatibility issue with Kotlin 2.0+
+tasks.matching { it.name.startsWith("hiltAggregateDeps") }.configureEach {
+    enabled = false
 }
 
 tasks.register("checkAndGenerateKeystore") {

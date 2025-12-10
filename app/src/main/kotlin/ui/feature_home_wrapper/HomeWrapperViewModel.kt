@@ -4,6 +4,8 @@ import com.application.MviViewModel
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class HomeWrapperState(
     val isDrawerOpen: Boolean = false
@@ -16,7 +18,8 @@ sealed class HomeWrapperEvent : UiEvent {
 
 sealed class HomeWrapperEffect : UiEffect
 
-class HomeWrapperViewModel : MviViewModel<HomeWrapperEvent, HomeWrapperState, HomeWrapperEffect>() {
+@HiltViewModel
+class HomeWrapperViewModel @Inject constructor() : MviViewModel<HomeWrapperEvent, HomeWrapperState, HomeWrapperEffect>() {
     override fun createInitialState(): HomeWrapperState = HomeWrapperState()
 
     override fun handleEvent(event: HomeWrapperEvent) {

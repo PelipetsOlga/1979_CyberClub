@@ -1,5 +1,12 @@
 package com.application.ui.feature_splash
 
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
+import androidx.compose.animation.core.tween
+import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.MaterialTheme
@@ -12,31 +19,40 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.application.ui.base.theme.colorBlack
-import com.application.ui.base.theme.colorWhite
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation.NavController
+import com.application.navigation.RootRoute
 import com.application.ui.theme.colorBackgroundMain
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorWhitePure
 
 @Composable
 fun SplashScreen(
-    onNavigateToOnboarding: () -> Unit,
-    onNavigateToHome: () -> Unit,
-    viewModel: SplashViewModel = hiltViewModel()
+    viewModel: SplashViewModel = hiltViewModel(),
+    navController: NavController
 ) {
-    val state by viewModel.viewState.collectAsState()
+    val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(Unit) {
         viewModel.checkFirstLaunch()
-        viewModel.effect.collect { effect ->
-            when (effect) {
+    }
+
+    LaunchedEffect(effect) {
+        effect?.let {
+            when (it) {
                 is SplashEffect.NavigateToOnboarding -> {
-                    onNavigateToOnboarding()
+                    navController.navigate(RootRoute.Onboarding.route) {
+                        popUpTo(RootRoute.Splash.route) { inclusive = true }
+                    }
                 }
                 is SplashEffect.NavigateToHome -> {
-                    onNavigateToHome()
+                    navController.navigate(RootRoute.Home.route) {
+                        popUpTo(RootRoute.Splash.route) { inclusive = true }
+                    }
                 }
             }
         }

@@ -3,6 +3,7 @@
     xmlns:tools="http://schemas.android.com/tools">
 
     <application
+        android:name=".di.App"
         android:label="${appName}"
         android:usesCleartextTraffic="true"
         android:allowBackup="true"

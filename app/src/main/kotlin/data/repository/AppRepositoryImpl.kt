@@ -1,10 +1,6 @@
-package com.application.data.data
+package com.application.data.repository
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import com.application.data.local.PreferencesManager
-import com.application.domain.models.domain.models.ChecklistData
-import com.application.domain.models.domain.models.PlaceFilter
 import com.application.domain.repository.AppRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.first
@@ -19,13 +15,12 @@ class AppRepositoryImpl @Inject constructor(
     override val isFirstLaunch: Flow<Boolean> = preferencesManager.isFirstLaunch
     
     override suspend fun isFirstLaunch(): Boolean {
-        return preferencesManager.isFirstLaunch().first()
+        return preferencesManager.isFirstLaunch()
     }
     
     override suspend fun setFirstLaunchCompleted() {
         preferencesManager.setFirstLaunchCompleted()
     }
-
 }
 
 

@@ -4,6 +4,8 @@ import com.application.MviViewModel
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
 
 data class CartState(
     val items: List<String> = emptyList(),
@@ -20,7 +22,8 @@ sealed class CartEffect : UiEffect {
     object NavigateBack : CartEffect()
 }
 
-class CartViewModel : MviViewModel<CartEvent, CartState, CartEffect>() {
+@HiltViewModel
+class CartViewModel @Inject constructor() : MviViewModel<CartEvent, CartState, CartEffect>() {
     override fun createInitialState(): CartState = CartState()
 
     override fun handleEvent(event: CartEvent) {
