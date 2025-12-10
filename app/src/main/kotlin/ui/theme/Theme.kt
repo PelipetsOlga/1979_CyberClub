@@ -39,6 +39,13 @@ val Manrope = FontFamily(
     Font(R.font.manrope_extrabold, FontWeight.ExtraBold),
 )
 
+val AppTextStyleNumbers = TextStyle(
+    fontFamily = Manrope,
+    fontSize = 24.sp,
+    lineHeight = 36.sp,
+    fontWeight = FontWeight.Bold
+)
+
 val AppTypography = Typography(
     // H1: 24/36
     headlineLarge = TextStyle(
