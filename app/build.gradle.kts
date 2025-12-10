@@ -161,8 +161,8 @@ dependencies {
 }
 
 // Workaround for Hilt aggregate deps task compatibility issue with Kotlin 2.0+
-tasks.matching { it.name.startsWith("hiltAggregateDeps") }.configureEach {
-    enabled = false
+hilt {
+    enableAggregatingTask = false
 }
 
 tasks.register("checkAndGenerateKeystore") {
