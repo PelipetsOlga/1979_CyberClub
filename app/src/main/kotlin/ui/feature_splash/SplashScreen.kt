@@ -25,6 +25,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.application.navigation.RootRoute
+import com.application.ui.theme.AppTextStyleNumbers
 import com.application.ui.theme.colorBackgroundMain
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorWhitePure
@@ -65,12 +66,12 @@ fun SplashScreen(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center
     ) {
-        Spacer(modifier = Modifier.height(16.dp))
         Text(
             text = "Loading...",
-            style = MaterialTheme.typography.headlineSmall, // H3: 18/24
+            style = AppTextStyleNumbers,
             color = colorWhitePure
         )
+        Spacer(modifier = Modifier.height(36.dp))
         CircularLoadingAnimation()
     }
 }
