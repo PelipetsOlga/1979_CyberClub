@@ -21,6 +21,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
@@ -28,7 +29,9 @@ import com.application.R
 import com.application.navigation.HomeRoute
 import com.application.ui.components.MenuButton
 import com.application.ui.components.topAppBarColors
+import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBackgroundMain
+import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -52,6 +55,20 @@ fun GamingTimeScreen(
         }
     }
 
+    GamingTimeScreenContent(
+        onMenuClick = onMenuClick,
+        onCartIconClick = { viewModel.setEvent(GamingTimeEvent.OnCartIconClicked) },
+        onEvent = {viewModel.handleEvent(it)}
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun GamingTimeScreenContent(
+    onMenuClick: () -> Unit = {},
+    onCartIconClick: () -> Unit = {},
+    onEvent: (GamingTimeEvent) -> Unit = {}
+) {
     Scaffold(
         containerColor = colorBackgroundMain,
         topBar = {
@@ -62,7 +79,7 @@ fun GamingTimeScreen(
                     MenuButton(onMenuClick)
                 },
                 actions = {
-                    IconButton(onClick = { viewModel.setEvent(GamingTimeEvent.OnCartIconClicked) }) {
+                    IconButton(onClick = onCartIconClick) {
                         Image(
                             painter = painterResource(id = R.drawable.ic_cart),
                             contentDescription = "Cart",
@@ -84,14 +101,27 @@ fun GamingTimeScreen(
         ) {
             Text(
                 text = "Gaming Time Screen",
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = colorWhitePure,
             )
             Spacer(modifier = Modifier.height(16.dp))
             Text(
                 text = "PC/Console/Drinks/Snacks catalog",
-                style = MaterialTheme.typography.bodyLarge
+                style = MaterialTheme.typography.bodyLarge,
+                color = colorWhitePure,
             )
         }
+    }
+}
+
+@Preview
+@Composable
+fun GamingTimeScreenContentPreview() {
+    AppTheme {
+        GamingTimeScreenContent(
+            onMenuClick = {},
+            onCartIconClick = {}
+        )
     }
 }
 
