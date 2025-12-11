@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.support.ui.feature_home_wrapper.support
 
 import com.application.MviViewModel
 import com.application.UiEffect

@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time
 
 import com.application.MviViewModel
 import com.application.UiEffect

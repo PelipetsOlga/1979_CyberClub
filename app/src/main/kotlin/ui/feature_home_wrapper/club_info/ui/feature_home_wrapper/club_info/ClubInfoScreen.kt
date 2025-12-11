@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.club_info.ui.feature_home_wrapper.club_info
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,45 +13,34 @@ import com.application.ui.components.MenuButton
 import com.application.ui.components.topAppBarColors
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBackgroundMain
-import com.application.ui.theme.colorRed
 import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartInnerScreen(
-    viewModel: CartInnerViewModel,
+fun ClubInfoScreen(
+    viewModel: ClubInfoViewModel,
     navController: NavController,
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
-    val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
 
-    LaunchedEffect(effect) {
-        effect?.let {
-            when (it) {
-                is CartInnerEffect.NavigateToOrderConfirmation -> {
-                    // Navigate to external OrderConfirmation screen
-                    // This would require passing rootNavController
-                }
-            }
-        }
+    LaunchedEffect(Unit) {
+        viewModel.setEvent(ClubInfoEvent.OnScreenShown)
     }
 
-    CartInnerScreenContent(
+    ClubInfoScreenContent(
         state = state,
         onMenuClick = onMenuClick,
-        onBackClick = { navController.popBackStack() },
         onEvent = { viewModel.setEvent(it) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun CartInnerScreenContent(
-    state: CartInnerState,
+fun ClubInfoScreenContent(
+    state: ClubInfoState,
     onMenuClick: () -> Unit = {},
-    onBackClick: () -> Unit = {},
-    onEvent: (CartInnerEvent) -> Unit = {}
+    onEvent: (ClubInfoEvent) -> Unit = {}
 ) {
     Scaffold(
         containerColor = colorBackgroundMain,
@@ -60,20 +49,12 @@ fun CartInnerScreenContent(
                 colors = topAppBarColors,
                 title = { 
                     Text(
-                        text = "Your Cart",
+                        text = "Club Info",
                         color = colorWhitePure
                     )
                 },
                 navigationIcon = {
                     MenuButton(onMenuClick)
-                },
-                actions = {
-                    TextButton(onClick = onBackClick) {
-                        Text(
-                            text = "Back",
-                            color = colorRed
-                        )
-                    }
                 }
             )
         }
@@ -87,42 +68,21 @@ fun CartInnerScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Cart Inner Screen",
+                text = "Club Info Screen",
                 style = MaterialTheme.typography.headlineLarge,
                 color = colorWhitePure
             )
-            Spacer(modifier = Modifier.height(16.dp))
-            if (state.items.isEmpty()) {
-                Text(
-                    text = "Cart is empty",
-                    color = colorWhitePure
-                )
-            } else {
-                state.items.forEach { item ->
-                    Text(
-                        text = item,
-                        color = colorWhitePure
-                    )
-                }
-            }
-            Spacer(modifier = Modifier.height(16.dp))
-            Button(
-                onClick = { onEvent(CartInnerEvent.OnCheckoutClicked) }
-            ) {
-                Text("Checkout")
-            }
         }
     }
 }
 
 @Preview
 @Composable
-fun CartInnerScreenContentPreview() {
+fun ClubInfoScreenContentPreview() {
     AppTheme {
-        CartInnerScreenContent(
-            state = CartInnerState(),
+        ClubInfoScreenContent(
+            state = ClubInfoState(),
             onMenuClick = {},
-            onBackClick = {},
             onEvent = {}
         )
     }

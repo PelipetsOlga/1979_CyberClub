@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.reserve_seat.ui.feature_home_wrapper.reserve_seat
 
 import com.application.MviViewModel
 import com.application.UiEffect

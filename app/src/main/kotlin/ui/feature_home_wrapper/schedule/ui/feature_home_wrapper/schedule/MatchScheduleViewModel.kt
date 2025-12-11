@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.schedule.ui.feature_home_wrapper.schedule
 
 import com.application.MviViewModel
 import com.application.UiEffect

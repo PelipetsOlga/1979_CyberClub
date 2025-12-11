@@ -34,6 +34,12 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.application.R
 import com.application.navigation.HomeRoute
+import com.application.ui.feature_home_wrapper.cart.ui.feature_home_wrapper.cart.CartInnerScreen
+import com.application.ui.feature_home_wrapper.club_info.ui.feature_home_wrapper.club_info.ClubInfoScreen
+import com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.GamingTimeScreen
+import com.application.ui.feature_home_wrapper.reserve_seat.ui.feature_home_wrapper.reserve_seat.ReserveSeatScreen
+import com.application.ui.feature_home_wrapper.schedule.ui.feature_home_wrapper.schedule.MatchScheduleScreen
+import com.application.ui.feature_home_wrapper.support.ui.feature_home_wrapper.support.SupportScreen
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorSteelBlue

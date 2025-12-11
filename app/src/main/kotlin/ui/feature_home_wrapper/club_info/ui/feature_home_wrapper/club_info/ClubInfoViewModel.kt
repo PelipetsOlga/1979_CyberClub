@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.club_info.ui.feature_home_wrapper.club_info
 
 import com.application.MviViewModel
 import com.application.UiEffect

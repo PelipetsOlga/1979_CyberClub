@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.cart.ui.feature_home_wrapper.cart
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -13,30 +13,45 @@ import com.application.ui.components.MenuButton
 import com.application.ui.components.topAppBarColors
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBackgroundMain
+import com.application.ui.theme.colorRed
 import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SupportScreen(
-    viewModel: SupportViewModel,
+fun CartInnerScreen(
+    viewModel: CartInnerViewModel,
     navController: NavController,
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
 
-    SupportScreenContent(
+    LaunchedEffect(effect) {
+        effect?.let {
+            when (it) {
+                is CartInnerEffect.NavigateToOrderConfirmation -> {
+                    // Navigate to external OrderConfirmation screen
+                    // This would require passing rootNavController
+                }
+            }
+        }
+    }
+
+    CartInnerScreenContent(
         state = state,
         onMenuClick = onMenuClick,
+        onBackClick = { navController.popBackStack() },
         onEvent = { viewModel.setEvent(it) }
     )
 }
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SupportScreenContent(
-    state: SupportState,
+fun CartInnerScreenContent(
+    state: CartInnerState,
     onMenuClick: () -> Unit = {},
-    onEvent: (SupportEvent) -> Unit = {}
+    onBackClick: () -> Unit = {},
+    onEvent: (CartInnerEvent) -> Unit = {}
 ) {
     Scaffold(
         containerColor = colorBackgroundMain,
@@ -45,12 +60,20 @@ fun SupportScreenContent(
                 colors = topAppBarColors,
                 title = { 
                     Text(
-                        text = "Support",
+                        text = "Your Cart",
                         color = colorWhitePure
                     )
                 },
                 navigationIcon = {
                     MenuButton(onMenuClick)
+                },
+                actions = {
+                    TextButton(onClick = onBackClick) {
+                        Text(
+                            text = "Back",
+                            color = colorRed
+                        )
+                    }
                 }
             )
         }
@@ -64,15 +87,29 @@ fun SupportScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Support Screen",
+                text = "Cart Inner Screen",
                 style = MaterialTheme.typography.headlineLarge,
                 color = colorWhitePure
             )
             Spacer(modifier = Modifier.height(16.dp))
+            if (state.items.isEmpty()) {
+                Text(
+                    text = "Cart is empty",
+                    color = colorWhitePure
+                )
+            } else {
+                state.items.forEach { item ->
+                    Text(
+                        text = item,
+                        color = colorWhitePure
+                    )
+                }
+            }
+            Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { onEvent(SupportEvent.OnSendMessageClicked) }
+                onClick = { onEvent(CartInnerEvent.OnCheckoutClicked) }
             ) {
-                Text("Send Message")
+                Text("Checkout")
             }
         }
     }
@@ -80,11 +117,12 @@ fun SupportScreenContent(
 
 @Preview
 @Composable
-fun SupportScreenContentPreview() {
+fun CartInnerScreenContentPreview() {
     AppTheme {
-        SupportScreenContent(
-            state = SupportState(),
+        CartInnerScreenContent(
+            state = CartInnerState(),
             onMenuClick = {},
+            onBackClick = {},
             onEvent = {}
         )
     }

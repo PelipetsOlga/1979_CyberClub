@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.support.ui.feature_home_wrapper.support
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -17,18 +17,14 @@ import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClubInfoScreen(
-    viewModel: ClubInfoViewModel,
+fun SupportScreen(
+    viewModel: SupportViewModel,
     navController: NavController,
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.setEvent(ClubInfoEvent.OnScreenShown)
-    }
-
-    ClubInfoScreenContent(
+    SupportScreenContent(
         state = state,
         onMenuClick = onMenuClick,
         onEvent = { viewModel.setEvent(it) }
@@ -37,10 +33,10 @@ fun ClubInfoScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ClubInfoScreenContent(
-    state: ClubInfoState,
+fun SupportScreenContent(
+    state: SupportState,
     onMenuClick: () -> Unit = {},
-    onEvent: (ClubInfoEvent) -> Unit = {}
+    onEvent: (SupportEvent) -> Unit = {}
 ) {
     Scaffold(
         containerColor = colorBackgroundMain,
@@ -49,7 +45,7 @@ fun ClubInfoScreenContent(
                 colors = topAppBarColors,
                 title = { 
                     Text(
-                        text = "Club Info",
+                        text = "Support",
                         color = colorWhitePure
                     )
                 },
@@ -68,20 +64,26 @@ fun ClubInfoScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Club Info Screen",
+                text = "Support Screen",
                 style = MaterialTheme.typography.headlineLarge,
                 color = colorWhitePure
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onEvent(SupportEvent.OnSendMessageClicked) }
+            ) {
+                Text("Send Message")
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun ClubInfoScreenContentPreview() {
+fun SupportScreenContentPreview() {
     AppTheme {
-        ClubInfoScreenContent(
-            state = ClubInfoState(),
+        SupportScreenContent(
+            state = SupportState(),
             onMenuClick = {},
             onEvent = {}
         )

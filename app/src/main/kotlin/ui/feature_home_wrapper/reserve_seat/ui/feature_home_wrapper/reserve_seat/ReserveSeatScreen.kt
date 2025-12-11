@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.reserve_seat.ui.feature_home_wrapper.reserve_seat
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.material3.*
@@ -17,18 +17,14 @@ import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MatchScheduleScreen(
-    viewModel: MatchScheduleViewModel,
+fun ReserveSeatScreen(
+    viewModel: ReserveSeatViewModel,
     navController: NavController,
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(Unit) {
-        viewModel.setEvent(MatchScheduleEvent.OnScreenShown)
-    }
-
-    MatchScheduleScreenContent(
+    ReserveSeatScreenContent(
         state = state,
         onMenuClick = onMenuClick,
         onEvent = { viewModel.setEvent(it) }
@@ -37,10 +33,10 @@ fun MatchScheduleScreen(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun MatchScheduleScreenContent(
-    state: MatchScheduleState,
+fun ReserveSeatScreenContent(
+    state: ReserveSeatState,
     onMenuClick: () -> Unit = {},
-    onEvent: (MatchScheduleEvent) -> Unit = {}
+    onEvent: (ReserveSeatEvent) -> Unit = {}
 ) {
     Scaffold(
         containerColor = colorBackgroundMain,
@@ -49,7 +45,7 @@ fun MatchScheduleScreenContent(
                 colors = topAppBarColors,
                 title = { 
                     Text(
-                        text = "Match Schedule",
+                        text = "Reserve Seat",
                         color = colorWhitePure
                     )
                 },
@@ -68,20 +64,26 @@ fun MatchScheduleScreenContent(
             verticalArrangement = Arrangement.Center
         ) {
             Text(
-                text = "Match Schedule Screen",
+                text = "Reserve Seat Screen",
                 style = MaterialTheme.typography.headlineLarge,
                 color = colorWhitePure
             )
+            Spacer(modifier = Modifier.height(16.dp))
+            Button(
+                onClick = { onEvent(ReserveSeatEvent.OnReserveClicked) }
+            ) {
+                Text("Reserve")
+            }
         }
     }
 }
 
 @Preview
 @Composable
-fun MatchScheduleScreenContentPreview() {
+fun ReserveSeatScreenContentPreview() {
     AppTheme {
-        MatchScheduleScreenContent(
-            state = MatchScheduleState(),
+        ReserveSeatScreenContent(
+            state = ReserveSeatState(),
             onMenuClick = {},
             onEvent = {}
         )

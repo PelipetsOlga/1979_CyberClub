@@ -1,4 +1,4 @@
-package com.application.ui.feature_home_wrapper
+package com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Arrangement
