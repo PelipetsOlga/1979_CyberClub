@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.IconButton
@@ -23,7 +24,11 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -63,16 +68,34 @@ fun HomeWrapperScreen(
         }
     }
 
+    // Track current route for drawer selection - observe NavController's current destination
+    var currentRoute by remember { 
+        mutableStateOf(homeNavController.currentDestination?.route ?: initialScreen) 
+    }
+
+    // Update current route when navigation changes
+    LaunchedEffect(homeNavController.currentDestination) {
+        homeNavController.currentDestination?.route?.let { route ->
+            currentRoute = route
+        }
+    }
+
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
             ModalDrawerSheetContent(
-                currentRoute = homeNavController.currentDestination?.route ?: initialScreen,
+                currentRoute = currentRoute,
                 onItemClick = { route ->
-                    homeNavController.navigate(route) {
-                        launchSingleTop = true
-                    }
+                    // Update route immediately when clicked
+                    currentRoute = route
                     scope.launch {
+                        homeNavController.navigate(route) {
+                            launchSingleTop = true
+                        }
+                        // Ensure route is updated after navigation
+                        homeNavController.currentDestination?.route?.let { 
+                            currentRoute = it 
+                        }
                         drawerState.close()
                     }
                 }
@@ -235,10 +258,10 @@ private fun DrawerIconButton(
             ) {
                 Box(
                     modifier = Modifier
-                        .size(56.dp)
+                        .size(48.dp)
                         .background(
                             color = colorWhitePure,
-                            shape = RoundedCornerShape(12.dp)
+                            shape = CircleShape
                         ),
                     contentAlignment = Alignment.Center
                 ) {
