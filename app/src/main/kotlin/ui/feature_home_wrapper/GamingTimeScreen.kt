@@ -1,17 +1,34 @@
 package com.application.ui.feature_home_wrapper
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
-import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.application.R
 import com.application.navigation.HomeRoute
+import com.application.ui.components.MenuButton
+import com.application.ui.components.topAppBarColors
+import com.application.ui.theme.colorBackgroundMain
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -36,17 +53,22 @@ fun GamingTimeScreen(
     }
 
     Scaffold(
+        containerColor = colorBackgroundMain,
         topBar = {
             TopAppBar(
-                title = { Text("Gaming Time") },
+                colors = topAppBarColors,
+                title = { },
                 navigationIcon = {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
-                    }
+                    MenuButton(onMenuClick)
                 },
                 actions = {
                     IconButton(onClick = { viewModel.setEvent(GamingTimeEvent.OnCartIconClicked) }) {
-                        Icon(Icons.Default.ShoppingCart, contentDescription = "Cart")
+                        Image(
+                            painter = painterResource(id = R.drawable.ic_cart),
+                            contentDescription = "Cart",
+                            modifier = Modifier.size(36.dp),
+                            contentScale = ContentScale.Fit,
+                        )
                     }
                 }
             )
