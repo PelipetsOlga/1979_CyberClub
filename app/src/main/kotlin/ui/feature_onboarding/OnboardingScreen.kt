@@ -2,8 +2,6 @@ package com.application.ui.feature_onboarding
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -12,21 +10,20 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.ArrowForward
-import androidx.compose.material3.Button
-import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material.icons.filled.KeyboardArrowRight
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -38,7 +35,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -46,10 +42,14 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.application.R
 import com.application.navigation.RootRoute
+import com.application.ui.components.PrimaryButton
+import com.application.ui.theme.AppTextStyleNumbers
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBackgroundMain
+import com.application.ui.theme.colorBackgroundSurface
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorWhitePure
+import com.application.ui.utils.clickableNoRipple
 
 @Composable
 fun OnboardingScreen(
@@ -60,7 +60,7 @@ fun OnboardingScreen(
     val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
     val pagerState = rememberPagerState(pageCount = { state.totalPages })
 
-    LaunchedEffect(pagerState.currentPage) {
+    LaunchedEffect(pagerState.currentPage, state.currentPage) {
         viewModel.setEvent(OnboardingEvent.OnPageChanged(pagerState.currentPage))
     }
 
@@ -82,7 +82,7 @@ fun OnboardingScreen(
             .background(colorBackgroundMain),
         color = colorBackgroundMain
     ) {
-        Box (
+        Box(
             modifier = Modifier.fillMaxSize(),
         ) {
             HorizontalPager(
@@ -90,30 +90,9 @@ fun OnboardingScreen(
                 modifier = Modifier.fillMaxSize()
             ) { page ->
                 OnboardingPage(
-                    pageNumber = page + 1,
+                    pageNumber = page,
+                    onEvent = { viewModel.handleEvent(it) }
                 )
-            }
-
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(16.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                if (state.currentPage == state.totalPages - 1) {
-                    Button(
-                        onClick = { viewModel.setEvent(OnboardingEvent.OnGetStartedClicked) }
-                    ) {
-                        Text("Get Started")
-                    }
-                } else {
-                    TextButton(
-                        onClick = { /* Next page handled by swipe */ }
-                    ) {
-                        Text("Next")
-                    }
-                }
             }
         }
     }
@@ -122,22 +101,25 @@ fun OnboardingScreen(
 @Composable
 fun OnboardingPage(
     pageNumber: Int,
+    onEvent: (OnboardingEvent) -> Unit
 ) {
     when (pageNumber) {
-        1 -> OnboardingPage1()
-        2 -> OnboardingPage2()
-        3 -> OnboardingPage3()
-        4 -> OnboardingPage4()
+        0 -> OnboardingPage1(onEvent)
+        1 -> OnboardingPage2(onEvent)
+        2 -> OnboardingPage3(onEvent)
+        3 -> OnboardingPage4(onEvent)
     }
 }
 
 @Composable
 fun OnboardingPage1(
+    onEvent: (OnboardingEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorBackgroundMain)
+
     ) {
         Image(
             painter = painterResource(id = R.mipmap.ic_welcome),
@@ -162,76 +144,55 @@ fun OnboardingPage1(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .navigationBarsPadding()
+                .statusBarsPadding()
                 .padding(horizontal = 24.dp, vertical = 40.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(4) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(4.dp)
-                            .background(
-                                color = if (index == 0) colorBluePrimary else Color.White.copy(alpha = 0.25f),
-                                shape = RoundedCornerShape(50)
-                            )
-                    )
-                    if (index != 3) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
+            ProgressIndicator(0)
 
             Column(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.Start
             ) {
                 Text(
-                    text = "Stay Updated",
-                    style = MaterialTheme.typography.headlineLarge,
-                    color = colorBluePrimary
+                    text = buildAnnotatedString {
+                        withStyle(style = SpanStyle(color = colorBluePrimary)) {
+                            append("Welcome to \n")
+                        }
+                        withStyle(style = SpanStyle(color = colorWhitePure)) {
+                            append("1w Cyber Club")
+                        }
+                    },
+                    style = AppTextStyleNumbers
                 )
                 Spacer(modifier = Modifier.height(16.dp))
+                // Description
                 Text(
-                    text = "Follow esports match schedules and club announcements in real time.",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colorWhitePure,
-                    textAlign = TextAlign.Center
+                    text = "Your gateway to high-end gaming, esports streaming and fast in-club services.",
+                    style = MaterialTheme.typography.headlineLarge,
+                    color = colorWhitePure
                 )
-            }
 
-            Button(
-                onClick = { /* Action handled by parent */ },
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(64.dp),
-                shape = RoundedCornerShape(32.dp),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = colorBluePrimary,
-                    contentColor = colorWhitePure
-                )
-            ) {
-                Text(
-                    text = "Get Started",
-                    style = MaterialTheme.typography.titleMedium
-                )
+                Spacer(modifier = Modifier.height(32.dp))
+
+                NextButtonWithArrow(onClick = { onEvent(OnboardingEvent.NextClicked) })
             }
         }
     }
 }
 
 @Composable
-fun OnboardingPage2(
+fun OnboardingPage3(
+    onEvent: (OnboardingEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorBackgroundMain)
+            .navigationBarsPadding()
+            .statusBarsPadding()
     ) {
         Column(
             modifier = Modifier
@@ -240,27 +201,7 @@ fun OnboardingPage2(
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Progress indicator - page 2 (first 3 solid, 4th inactive)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(4) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(4.dp)
-                            .background(
-                                color = if (index < 3) colorBluePrimary else Color.White.copy(alpha = 0.25f),
-                                shape = RoundedCornerShape(50)
-                            )
-                    )
-                    if (index != 3) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
+            ProgressIndicator(2)
 
             // Payment terminal illustration
             Image(
@@ -268,13 +209,17 @@ fun OnboardingPage2(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(16.dp)
                     .weight(1f),
                 contentScale = ContentScale.Fit
             )
 
             // Bottom content section
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp)
+                    .padding(bottom = 16.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 // Title with mixed colors
@@ -287,106 +232,112 @@ fun OnboardingPage2(
                             append("Faster")
                         }
                     },
-                    style = MaterialTheme.typography.headlineLarge
+                    style = AppTextStyleNumbers
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Description
                 Text(
                     text = "Buy gaming time, drinks and snacks. Your cart syncs automatically.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = colorWhitePure
                 )
-                
+
                 Spacer(modifier = Modifier.height(32.dp))
-                
-                // Next button with arrow
-                Row(
-                    modifier = Modifier
-                        .clickable { /* Action handled by parent */ },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        colorBluePrimary,
-                                        colorBluePrimary.copy(alpha = 0.7f)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Next",
-                            tint = colorWhitePure,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Next",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
-                    )
-                }
+
+                NextButtonWithArrow(onClick = {onEvent(OnboardingEvent.NextClicked) })
             }
         }
     }
 }
 
 @Composable
-fun OnboardingPage3(
+fun NextButtonWithArrow(onClick: () -> Unit) {
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickableNoRipple { onClick() },
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.Start
+    ) {
+        Box(
+            modifier = Modifier
+                .size(56.dp)
+                .background(
+                    brush = Brush.horizontalGradient(
+                        colors = listOf(
+                            colorBluePrimary,
+                            colorBluePrimary.copy(alpha = 0.7f)
+                        )
+                    ),
+                    shape = RoundedCornerShape(16.dp)
+                ),
+            contentAlignment = Alignment.Center
+        ) {
+            Icon(
+                imageVector = Icons.Default.KeyboardArrowRight,
+                contentDescription = "Next",
+                tint = colorWhitePure,
+                modifier = Modifier.size(24.dp)
+            )
+        }
+        Spacer(modifier = Modifier.width(12.dp))
+        Text(
+            text = "Next",
+            style = MaterialTheme.typography.titleMedium,
+            color = colorWhitePure
+        )
+    }
+}
+
+@Composable
+private fun ProgressIndicator(pageNumber: Int) {
+    // Progress indicator - page 2 (first 3 solid, 4th inactive)
+    Row(
+        modifier = Modifier
+            .fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        repeat(4) { index ->
+            Box(
+                modifier = Modifier
+                    .width(60.dp)
+                    .height(4.dp)
+                    .background(
+                        color = if (index <= pageNumber) colorBluePrimary else Color.White.copy(
+                            alpha = 0.25f
+                        ),
+                        shape = RoundedCornerShape(50)
+                    )
+            )
+            if (index != 3) {
+                Spacer(modifier = Modifier.width(8.dp))
+            }
+        }
+    }
+}
+
+@Composable
+fun OnboardingPage2(
+    onEvent: (OnboardingEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorBackgroundMain)
+            .navigationBarsPadding()
+            .statusBarsPadding(),
+        contentAlignment = Alignment.TopStart
     ) {
         Column(
             modifier = Modifier
-                .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 40.dp),
-            verticalArrangement = Arrangement.SpaceBetween,
+                .fillMaxWidth()
+                .padding(top = 40.dp),
+            verticalArrangement = Arrangement.Top,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Progress indicator - page 3 (first 2 solid, last 2 outlined)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(4) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(4.dp)
-                            .background(
-                                color = if (index < 2) colorBluePrimary else Color.Transparent,
-                                shape = RoundedCornerShape(50)
-                            )
-                            .then(
-                                if (index >= 2) {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = colorBluePrimary.copy(alpha = 0.5f),
-                                        shape = RoundedCornerShape(50)
-                                    )
-                                } else {
-                                    Modifier
-                                }
-                            )
-                    )
-                    if (index != 3) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
+            ProgressIndicator(1)
 
             // Phone illustration
             Image(
@@ -394,16 +345,27 @@ fun OnboardingPage3(
                 contentDescription = null,
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(40.dp)
                     .weight(1f),
                 contentScale = ContentScale.Fit
             )
+        }
 
-            // Bottom content section
+        // Bottom content section
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            horizontalAlignment = Alignment.Start,
+            verticalArrangement = Arrangement.Bottom
+        ) {
+            // Title with mixed colors
             Column(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalAlignment = Alignment.Start
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .background(colorBackgroundSurface)
+                    .padding(64.dp),
+                horizontalAlignment = Alignment.Start,
+                verticalArrangement = Arrangement.Bottom
             ) {
-                // Title with mixed colors
                 Text(
                     text = buildAnnotatedString {
                         withStyle(style = SpanStyle(color = colorWhitePure)) {
@@ -413,54 +375,21 @@ fun OnboardingPage3(
                             append("Gaming Spot")
                         }
                     },
-                    style = MaterialTheme.typography.headlineLarge
+                    style = AppTextStyleNumbers
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Description
                 Text(
                     text = "Reserve PC or console seats instantly and skip waiting in line.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = colorWhitePure
                 )
-                
+
                 Spacer(modifier = Modifier.height(32.dp))
-                
-                // Next button with arrow
-                Row(
-                    modifier = Modifier
-                        .clickable { /* Action handled by parent */ },
-                    verticalAlignment = Alignment.CenterVertically
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .size(56.dp)
-                            .background(
-                                brush = Brush.horizontalGradient(
-                                    colors = listOf(
-                                        colorBluePrimary,
-                                        colorBluePrimary.copy(alpha = 0.7f)
-                                    )
-                                ),
-                                shape = RoundedCornerShape(16.dp)
-                            ),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        Icon(
-                            imageVector = Icons.Default.ArrowForward,
-                            contentDescription = "Next",
-                            tint = colorWhitePure,
-                            modifier = Modifier.size(24.dp)
-                        )
-                    }
-                    Spacer(modifier = Modifier.width(12.dp))
-                    Text(
-                        text = "Next",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
-                    )
-                }
+
+                NextButtonWithArrow(onClick = {onEvent(OnboardingEvent.NextClicked) })
             }
         }
     }
@@ -468,65 +397,39 @@ fun OnboardingPage3(
 
 @Composable
 fun OnboardingPage4(
+    onEvent: (OnboardingEvent) -> Unit
 ) {
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(colorBackgroundMain)
     ) {
+        // VR headset illustration
+        Image(
+            painter = painterResource(id = R.mipmap.ic_mask),
+            contentDescription = null,
+            modifier = Modifier
+                .fillMaxSize(),
+            contentScale = ContentScale.Crop
+        )
+
         Column(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(horizontal = 24.dp, vertical = 40.dp),
+                .navigationBarsPadding()
+                .statusBarsPadding()
+                .padding(top = 40.dp),
             verticalArrangement = Arrangement.SpaceBetween,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            // Progress indicator - page 4 (first 3 solid, 4th outlined)
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth(),
-                horizontalArrangement = Arrangement.Center
-            ) {
-                repeat(4) { index ->
-                    Box(
-                        modifier = Modifier
-                            .width(60.dp)
-                            .height(4.dp)
-                            .background(
-                                color = if (index < 3) colorBluePrimary else Color.Transparent,
-                                shape = RoundedCornerShape(50)
-                            )
-                            .then(
-                                if (index == 3) {
-                                    Modifier.border(
-                                        width = 1.dp,
-                                        color = colorBluePrimary,
-                                        shape = RoundedCornerShape(50)
-                                    )
-                                } else {
-                                    Modifier
-                                }
-                            )
-                    )
-                    if (index != 3) {
-                        Spacer(modifier = Modifier.width(8.dp))
-                    }
-                }
-            }
-
-            // VR headset illustration
-            Image(
-                painter = painterResource(id = R.mipmap.ic_mask),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .weight(1f),
-                contentScale = ContentScale.Fit
-            )
+            ProgressIndicator(3)
 
             // Bottom content section
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(24.dp)
+                    .padding(bottom = 40.dp),
                 horizontalAlignment = Alignment.Start
             ) {
                 // Title with mixed colors
@@ -539,43 +442,25 @@ fun OnboardingPage4(
                             append("Updated")
                         }
                     },
-                    style = MaterialTheme.typography.headlineLarge
+                    style = AppTextStyleNumbers
                 )
-                
+
                 Spacer(modifier = Modifier.height(16.dp))
-                
+
                 // Description
                 Text(
                     text = "Follow esports match schedules and club announcements in real time.",
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.headlineLarge,
                     color = colorWhitePure
                 )
-                
+
                 Spacer(modifier = Modifier.height(32.dp))
-                
+
                 // Get Started button (no arrow, full width)
-                Box(
-                    modifier = Modifier
+                PrimaryButton(
+                    text = "Get Started", onClick = {onEvent(OnboardingEvent.OnGetStartedClicked) }, modifier = Modifier
                         .fillMaxWidth()
-                        .height(64.dp)
-                        .clickable { /* Action handled by parent */ }
-                        .background(
-                            brush = Brush.horizontalGradient(
-                                colors = listOf(
-                                    Color(0xFF003D99),
-                                    colorBluePrimary
-                                )
-                            ),
-                            shape = RoundedCornerShape(32.dp)
-                        ),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Get Started",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
-                    )
-                }
+                )
             }
         }
     }
@@ -585,7 +470,7 @@ fun OnboardingPage4(
 @Composable
 fun OnboardingPage1Preview() {
     AppTheme {
-        OnboardingPage1()
+        OnboardingPage1({})
     }
 }
 
@@ -593,7 +478,7 @@ fun OnboardingPage1Preview() {
 @Composable
 fun OnboardingPage2Preview() {
     AppTheme {
-        OnboardingPage2()
+        OnboardingPage2({})
     }
 }
 
@@ -601,7 +486,7 @@ fun OnboardingPage2Preview() {
 @Composable
 fun OnboardingPage3Preview() {
     AppTheme {
-        OnboardingPage3()
+        OnboardingPage3({})
     }
 }
 
@@ -609,6 +494,6 @@ fun OnboardingPage3Preview() {
 @Composable
 fun OnboardingPage4Preview() {
     AppTheme {
-        OnboardingPage4()
+        OnboardingPage4({})
     }
 }

@@ -8,6 +8,7 @@ val colorYellow = Color(0xFFFFCC00)
 val colorRed = Color(0xFFFF3355)
 val colorBlack = Color(0xFF0a0a0a)
 val colorBackgroundMain = Color(0xFF0A0F1F)
+val colorBackgroundSurface = Color(0xFF121A2B)
 val colorWhitePure = Color(0xFFFFFFFF)
 val colorBluePrimary = Color(0xFF0066FF)
 

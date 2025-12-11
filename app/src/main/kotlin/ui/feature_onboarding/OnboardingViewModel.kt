@@ -17,6 +17,7 @@ data class OnboardingState(
 
 sealed class OnboardingEvent : UiEvent {
     object OnGetStartedClicked : OnboardingEvent()
+    object NextClicked : OnboardingEvent()
     data class OnPageChanged(val page: Int) : OnboardingEvent()
 }
 
@@ -39,8 +40,14 @@ class OnboardingViewModel @Inject constructor(
                     setEffect { OnboardingEffect.NavigateToHome }
                 }
             }
+
             is OnboardingEvent.OnPageChanged -> {
                 setState { copy(currentPage = event.page) }
+            }
+
+            is OnboardingEvent.NextClicked -> {
+                val newPage = (viewState.value.currentPage + 1).takeIf { it < 4 } ?: 3
+                setState { copy(currentPage = newPage) }
             }
         }
     }

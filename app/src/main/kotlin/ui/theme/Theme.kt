@@ -46,12 +46,18 @@ val AppTextStyleNumbers = TextStyle(
     fontWeight = FontWeight.Bold
 )
 
+val AppTextStyleButton= TextStyle(
+    fontFamily = Manrope,
+    fontSize = 20.sp,
+    lineHeight = 24.sp,
+    fontWeight = FontWeight.Bold
+)
+
 val AppTypography = Typography(
-    // H1: 24/36
     headlineLarge = TextStyle(
         fontFamily = Manrope,
-        fontSize = 24.sp,
-        lineHeight = 36.sp,
+        fontSize = 22.sp,
+        lineHeight = 32.sp,
         fontWeight = FontWeight.Normal
     ),
     // H2: 20/30
