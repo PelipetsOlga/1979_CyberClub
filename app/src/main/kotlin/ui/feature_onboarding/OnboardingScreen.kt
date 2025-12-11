@@ -60,8 +60,18 @@ fun OnboardingScreen(
     val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
     val pagerState = rememberPagerState(pageCount = { state.totalPages })
 
-    LaunchedEffect(pagerState.currentPage, state.currentPage) {
-        viewModel.setEvent(OnboardingEvent.OnPageChanged(pagerState.currentPage))
+    // Sync pager scroll to ViewModel state changes (e.g., when NextClicked)
+    LaunchedEffect(state.currentPage) {
+        if (pagerState.currentPage != state.currentPage) {
+            pagerState.animateScrollToPage(state.currentPage)
+        }
+    }
+
+    // Sync pager state changes back to ViewModel
+    LaunchedEffect(pagerState.currentPage) {
+        if (pagerState.currentPage != state.currentPage) {
+            viewModel.setEvent(OnboardingEvent.OnPageChanged(pagerState.currentPage))
+        }
     }
 
     LaunchedEffect(effect) {
@@ -69,7 +79,7 @@ fun OnboardingScreen(
             when (it) {
                 is OnboardingEffect.NavigateToHome -> {
                     navController.navigate(RootRoute.Home.route) {
-                        popUpTo(RootRoute.Splash.route) { inclusive = true }
+                        popUpTo(RootRoute.Onboarding.route) { inclusive = true }
                     }
                 }
             }
