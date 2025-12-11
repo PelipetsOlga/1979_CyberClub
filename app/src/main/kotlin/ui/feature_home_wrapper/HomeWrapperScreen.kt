@@ -1,19 +1,43 @@
 package com.application.ui.feature_home_wrapper
 
-import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
-import androidx.compose.material3.*
-import androidx.compose.runtime.*
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.DrawerValue
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.ModalDrawerSheet
+import androidx.compose.material3.ModalNavigationDrawer
+import androidx.compose.material3.rememberDrawerState
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.application.R
 import com.application.navigation.HomeRoute
+import com.application.ui.theme.AppTheme
+import com.application.ui.theme.colorBluePrimary
+import com.application.ui.theme.colorSteelBlue
+import com.application.ui.theme.colorWhitePure
 import kotlinx.coroutines.launch
 
 @Composable
@@ -36,21 +60,17 @@ fun HomeWrapperScreen(
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet(
-                modifier = Modifier.width(280.dp)
-            ) {
-                DrawerHeader()
-                DrawerBody(
-                    onItemClick = { route ->
-                        homeNavController.navigate(route) {
-                            launchSingleTop = true
-                        }
-                        scope.launch {
-                            drawerState.close()
-                        }
+            ModalDrawerSheetContent(
+                currentRoute = homeNavController.currentDestination?.route ?: initialScreen,
+                onItemClick = { route ->
+                    homeNavController.navigate(route) {
+                        launchSingleTop = true
                     }
-                )
-            }
+                    scope.launch {
+                        drawerState.close()
+                    }
+                }
+            )
         }
     ) {
         NavHost(
@@ -108,54 +128,165 @@ fun DrawerHeader() {
     Column(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(16.dp)
+            .padding(vertical = 16.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Text(
-            text = "Menu",
-            style = MaterialTheme.typography.headlineSmall
+        Spacer(
+            modifier = Modifier
+                .width(32.dp)
+                .height(1.dp)
+                .background(colorWhitePure)
         )
     }
 }
 
 @Composable
 fun DrawerBody(
+    currentRoute: String,
     onItemClick: (String) -> Unit
 ) {
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.PlayArrow, contentDescription = null) },
-        label = { Text("Gaming Time") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.GamingTime.route) }
-    )
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.ShoppingCart, contentDescription = null) },
-        label = { Text("Cart") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.CartInner.route) }
-    )
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.DateRange, contentDescription = null) },
-        label = { Text("Match Schedule") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.MatchSchedule.route) }
-    )
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.Place, contentDescription = null) },
-        label = { Text("Reserve Seat") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.ReserveSeat.route) }
-    )
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.Info, contentDescription = null) },
-        label = { Text("Club Info") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.ClubInfo.route) }
-    )
-    NavigationDrawerItem(
-        icon = { Icon(Icons.Default.Settings, contentDescription = null) },
-        label = { Text("Support") },
-        selected = false,
-        onClick = { onItemClick(HomeRoute.Support.route) }
-    )
+    Column(
+        modifier = Modifier.fillMaxWidth(),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        // Home (Gaming Time)
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home,
+            route = HomeRoute.GamingTime.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.GamingTime.route) }
+        )
+        
+        // Schedule (Match Schedule)
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_schedule,
+            route = HomeRoute.MatchSchedule.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.MatchSchedule.route) }
+        )
+        
+        // Cart
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_cart,
+            route = HomeRoute.CartInner.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.CartInner.route) }
+        )
+        
+        // Seat (Reserve Seat)
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_seat,
+            route = HomeRoute.ReserveSeat.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.ReserveSeat.route) }
+        )
+        
+        // Info (Club Info)
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_info,
+            route = HomeRoute.ClubInfo.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.ClubInfo.route) }
+        )
+        
+        // Support
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_support,
+            route = HomeRoute.Support.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.Support.route) }
+        )
+        
+        // Live
+        DrawerIconButton(
+            iconRes = R.drawable.ic_live,
+            route = "", // No route for Live, can be customized
+            currentRoute = currentRoute,
+            onClick = { /* Handle Live click */ }
+        )
+    }
+}
+
+@Composable
+private fun DrawerIconButton(
+    iconRes: Int,
+    route: String,
+    currentRoute: String,
+    onClick: () -> Unit
+) {
+    val isSelected = route == currentRoute && route.isNotEmpty()
+    
+    Box(
+        modifier = Modifier
+            .size(56.dp),
+        contentAlignment = Alignment.Center
+    ) {
+        if (isSelected) {
+            IconButton(
+                onClick = onClick,
+                modifier = Modifier.size(56.dp)
+            ) {
+                Box(
+                    modifier = Modifier
+                        .size(56.dp)
+                        .background(
+                            color = colorWhitePure,
+                            shape = RoundedCornerShape(12.dp)
+                        ),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Image(
+                        painter = painterResource(id = iconRes),
+                        contentDescription = null,
+                        modifier = Modifier.size(32.dp),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = ColorFilter.tint(colorBluePrimary)
+                    )
+                }
+            }
+        } else {
+            IconButton(
+                onClick = onClick,
+                modifier = Modifier.size(56.dp)
+            ) {
+                Image(
+                    painter = painterResource(id = iconRes),
+                    contentDescription = null,
+                    modifier = Modifier.size(32.dp),
+                    contentScale = ContentScale.Fit,
+                    colorFilter = ColorFilter.tint(colorWhitePure.copy(alpha = 0.7f))
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ModalDrawerSheetContent(
+    currentRoute: String = HomeRoute.GamingTime.route,
+    onItemClick: (String) -> Unit
+) {
+    ModalDrawerSheet(
+        modifier = Modifier.width(96.dp),
+        drawerContainerColor = colorSteelBlue.copy(alpha = 0.4f)
+    ) {
+        DrawerHeader()
+        DrawerBody(
+            currentRoute = currentRoute,
+            onItemClick = onItemClick
+        )
+    }
+}
+
+@Preview
+@Composable
+fun ModalDrawerSheetContentPreview() {
+    AppTheme {
+        ModalDrawerSheetContent(
+            currentRoute = HomeRoute.GamingTime.route,
+            onItemClick = {}
+        )
+    }
 }
 

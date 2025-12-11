@@ -11,6 +11,7 @@ val colorBackgroundMain = Color(0xFF0A0F1F)
 val colorBackgroundSurface = Color(0xFF121A2B)
 val colorWhitePure = Color(0xFFFFFFFF)
 val colorBluePrimary = Color(0xFF0066FF)
+val colorSteelBlue = Color(0xFF6A80A8)
 
 val colorGreyCool = Color(0xFFA6B0C3)
 
