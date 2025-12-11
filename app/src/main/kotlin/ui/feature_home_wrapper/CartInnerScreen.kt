@@ -1,15 +1,20 @@
 package com.application.ui.feature_home_wrapper
 
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Menu
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
+import com.application.ui.components.MenuButton
+import com.application.ui.components.topAppBarColors
+import com.application.ui.theme.AppTheme
+import com.application.ui.theme.colorBackgroundMain
+import com.application.ui.theme.colorRed
+import com.application.ui.theme.colorWhitePure
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -32,13 +37,42 @@ fun CartInnerScreen(
         }
     }
 
+    CartInnerScreenContent(
+        state = state,
+        onMenuClick = onMenuClick,
+        onBackClick = { navController.popBackStack() },
+        onEvent = { viewModel.setEvent(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun CartInnerScreenContent(
+    state: CartInnerState,
+    onMenuClick: () -> Unit = {},
+    onBackClick: () -> Unit = {},
+    onEvent: (CartInnerEvent) -> Unit = {}
+) {
     Scaffold(
+        containerColor = colorBackgroundMain,
         topBar = {
             TopAppBar(
-                title = { Text("Cart (Inner)") },
+                colors = topAppBarColors,
+                title = { 
+                    Text(
+                        text = "Your Cart",
+                        color = colorWhitePure
+                    )
+                },
                 navigationIcon = {
-                    IconButton(onClick = onMenuClick) {
-                        Icon(Icons.Default.Menu, contentDescription = "Menu")
+                    MenuButton(onMenuClick)
+                },
+                actions = {
+                    TextButton(onClick = onBackClick) {
+                        Text(
+                            text = "Back",
+                            color = colorRed
+                        )
                     }
                 }
             )
@@ -54,19 +88,26 @@ fun CartInnerScreen(
         ) {
             Text(
                 text = "Cart Inner Screen",
-                style = MaterialTheme.typography.headlineLarge
+                style = MaterialTheme.typography.headlineLarge,
+                color = colorWhitePure
             )
             Spacer(modifier = Modifier.height(16.dp))
             if (state.items.isEmpty()) {
-                Text("Cart is empty")
+                Text(
+                    text = "Cart is empty",
+                    color = colorWhitePure
+                )
             } else {
                 state.items.forEach { item ->
-                    Text(item)
+                    Text(
+                        text = item,
+                        color = colorWhitePure
+                    )
                 }
             }
             Spacer(modifier = Modifier.height(16.dp))
             Button(
-                onClick = { viewModel.setEvent(CartInnerEvent.OnCheckoutClicked) }
+                onClick = { onEvent(CartInnerEvent.OnCheckoutClicked) }
             ) {
                 Text("Checkout")
             }
@@ -74,3 +115,15 @@ fun CartInnerScreen(
     }
 }
 
+@Preview
+@Composable
+fun CartInnerScreenContentPreview() {
+    AppTheme {
+        CartInnerScreenContent(
+            state = CartInnerState(),
+            onMenuClick = {},
+            onBackClick = {},
+            onEvent = {}
+        )
+    }
+}

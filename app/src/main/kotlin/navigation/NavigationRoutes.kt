@@ -10,7 +10,6 @@ sealed class RootRoute(val route: String) {
     object HomeWrapper : RootRoute("home_wrapper/{initialScreen}") {
         fun createRoute(initialScreen: String) = "home_wrapper/$initialScreen"
     }
-    object Cart : RootRoute("cart")
     object OrderConfirmation : RootRoute("order_confirmation")
 }
 

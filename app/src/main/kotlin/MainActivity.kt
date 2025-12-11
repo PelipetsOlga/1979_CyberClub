@@ -16,7 +16,6 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import dagger.hilt.android.AndroidEntryPoint
 import com.application.navigation.RootRoute
-import com.application.ui.feature_cart.CartScreen
 import com.application.ui.feature_home.HomeScreen
 import com.application.ui.feature_home_wrapper.HomeWrapperScreen
 import com.application.ui.feature_onboarding.OnboardingScreen
@@ -78,13 +77,6 @@ class MainActivity : ComponentActivity() {
                                 initialScreen = initialScreen,
                                 rootNavController = rootNavController,
                                 viewModel = hiltViewModel()
-                            )
-                        }
-                        
-                        composable(RootRoute.Cart.route) {
-                            CartScreen(
-                                viewModel = hiltViewModel(),
-                                navController = rootNavController
                             )
                         }
                         

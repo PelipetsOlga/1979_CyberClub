@@ -22,7 +22,6 @@ sealed class HomeEvent : UiEvent {
 
 sealed class HomeEffect : UiEffect {
     data class NavigateToHomeWrapper(val screen: String) : HomeEffect()
-    object NavigateToCart : HomeEffect()
 }
 
 @HiltViewModel
@@ -35,7 +34,7 @@ class HomeViewModel @Inject constructor() : MviViewModel<HomeEvent, HomeState, H
                 setEffect { HomeEffect.NavigateToHomeWrapper("gaming_time") }
             }
             is HomeEvent.OnCartClicked -> {
-                setEffect { HomeEffect.NavigateToCart }
+                setEffect { HomeEffect.NavigateToHomeWrapper("cart_inner") }
             }
             is HomeEvent.OnMatchScheduleClicked -> {
                 setEffect { HomeEffect.NavigateToHomeWrapper("match_schedule") }

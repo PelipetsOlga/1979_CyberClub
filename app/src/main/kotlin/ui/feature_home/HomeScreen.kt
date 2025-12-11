@@ -67,10 +67,6 @@ fun HomeScreen(
                 is HomeEffect.NavigateToHomeWrapper -> {
                     navController.navigate(RootRoute.HomeWrapper.createRoute(it.screen))
                 }
-
-                is HomeEffect.NavigateToCart -> {
-                    navController.navigate(RootRoute.Cart.route)
-                }
             }
         }
     }
