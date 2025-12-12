@@ -12,16 +12,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.DrawerValue
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.ModalDrawerSheet
 import androidx.compose.material3.ModalNavigationDrawer
 import androidx.compose.material3.rememberDrawerState
-import androidx.compose.ui.Alignment
-import androidx.compose.ui.graphics.ColorFilter
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -29,7 +24,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ColorFilter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -39,6 +38,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
 import com.application.R
 import com.application.navigation.HomeRoute
+import com.application.navigation.RootRoute
 import com.application.ui.feature_home_wrapper.cart.ui.feature_home_wrapper.cart.CartInnerScreen
 import com.application.ui.feature_home_wrapper.club_info.ui.feature_home_wrapper.club_info.ClubInfoScreen
 import com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.GamingTimeScreen
@@ -64,13 +64,15 @@ fun HomeWrapperScreen(
     // Navigate to initial screen
     LaunchedEffect(initialScreen) {
         homeNavController.navigate(initialScreen) {
-            popUpTo(HomeRoute.GamingTime.route) { inclusive = true }
+            // Ensure a single inner destination on start
+            popUpTo(homeNavController.graph.startDestinationRoute ?: initialScreen) { inclusive = true }
+            launchSingleTop = true
         }
     }
 
     // Track current route for drawer selection - observe NavController's current destination
-    var currentRoute by remember { 
-        mutableStateOf(homeNavController.currentDestination?.route ?: initialScreen) 
+    var currentRoute by remember {
+        mutableStateOf(homeNavController.currentDestination?.route ?: initialScreen)
     }
 
     // Update current route when navigation changes
@@ -86,17 +88,34 @@ fun HomeWrapperScreen(
             ModalDrawerSheetContent(
                 currentRoute = currentRoute,
                 onItemClick = { route ->
-                    // Update route immediately when clicked
-                    currentRoute = route
-                    scope.launch {
-                        homeNavController.navigate(route) {
-                            launchSingleTop = true
+                    if (route == "home") {
+                        scope.launch {
+                            drawerState.close()
+                            // Close HomeWrapperScreen and return to HomeScreen
+                            val poppedToHome = rootNavController.popBackStack(RootRoute.Home.route, false)
+                            if (!poppedToHome) {
+                                rootNavController.navigate(RootRoute.Home.route) {
+                                    launchSingleTop = true
+                                }
+                            }
                         }
-                        // Ensure route is updated after navigation
-                        homeNavController.currentDestination?.route?.let { 
-                            currentRoute = it 
+                    } else {
+                        // Update route immediately when clicked
+                        currentRoute = route
+                        scope.launch {
+                            homeNavController.navigate(route) {
+                                // Keep only ONE inner destination in the stack
+                                popUpTo(homeNavController.graph.startDestinationRoute ?: initialScreen) {
+                                    inclusive = true
+                                }
+                                launchSingleTop = true
+                            }
+                            // Ensure route is updated after navigation
+                            homeNavController.currentDestination?.route?.let {
+                                currentRoute = it
+                            }
+                            drawerState.close()
                         }
-                        drawerState.close()
                     }
                 }
             )
@@ -179,22 +198,22 @@ fun DrawerBody(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        // Home (Gaming Time)
+        // Home (close wrapper -> HomeScreen)
         DrawerIconButton(
             iconRes = R.drawable.ic_home,
+            route = "home",
+            currentRoute = currentRoute,
+            onClick = { onItemClick("home") }
+        )
+
+        // Gaming Time
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_gaming_time,
             route = HomeRoute.GamingTime.route,
             currentRoute = currentRoute,
             onClick = { onItemClick(HomeRoute.GamingTime.route) }
         )
-        
-        // Schedule (Match Schedule)
-        DrawerIconButton(
-            iconRes = R.drawable.ic_home_schedule,
-            route = HomeRoute.MatchSchedule.route,
-            currentRoute = currentRoute,
-            onClick = { onItemClick(HomeRoute.MatchSchedule.route) }
-        )
-        
+
         // Cart
         DrawerIconButton(
             iconRes = R.drawable.ic_home_cart,
@@ -202,7 +221,15 @@ fun DrawerBody(
             currentRoute = currentRoute,
             onClick = { onItemClick(HomeRoute.CartInner.route) }
         )
-        
+
+        // Schedule (Match Schedule)
+        DrawerIconButton(
+            iconRes = R.drawable.ic_home_schedule,
+            route = HomeRoute.MatchSchedule.route,
+            currentRoute = currentRoute,
+            onClick = { onItemClick(HomeRoute.MatchSchedule.route) }
+        )
+
         // Seat (Reserve Seat)
         DrawerIconButton(
             iconRes = R.drawable.ic_home_seat,
@@ -210,7 +237,7 @@ fun DrawerBody(
             currentRoute = currentRoute,
             onClick = { onItemClick(HomeRoute.ReserveSeat.route) }
         )
-        
+
         // Info (Club Info)
         DrawerIconButton(
             iconRes = R.drawable.ic_home_info,
@@ -218,7 +245,7 @@ fun DrawerBody(
             currentRoute = currentRoute,
             onClick = { onItemClick(HomeRoute.ClubInfo.route) }
         )
-        
+
         // Support
         DrawerIconButton(
             iconRes = R.drawable.ic_home_support,
@@ -226,7 +253,7 @@ fun DrawerBody(
             currentRoute = currentRoute,
             onClick = { onItemClick(HomeRoute.Support.route) }
         )
-        
+
         // Live
         DrawerIconButton(
             iconRes = R.drawable.ic_live,
@@ -245,7 +272,7 @@ private fun DrawerIconButton(
     onClick: () -> Unit
 ) {
     val isSelected = route == currentRoute && route.isNotEmpty()
-    
+
     Box(
         modifier = Modifier
             .size(56.dp),
