@@ -41,6 +41,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.application.R
+import com.application.domain.model.ItemCategory
 import com.application.navigation.HomeRoute
 import com.application.ui.components.MenuButton
 import com.application.ui.components.topAppBarColors
@@ -159,12 +160,12 @@ fun GamingTimeScreenContent(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
             ) {
-                items(state.filteredItems) { item ->
-                    ItemCard(
-                        item = item,
-                        onAddToCart = { onEvent(GamingTimeEvent.OnAddToCart(item)) }
-                    )
-                }
+                    items(state.filteredItems) { item ->
+                        ItemCard(
+                            item = item,
+                            onAddToCart = { onEvent(GamingTimeEvent.OnAddToCart(item)) }
+                        )
+                    }
             }
         }
     }
@@ -274,7 +275,7 @@ fun ItemCard(
                 
                 // Icon on the right
                 Image(
-                    painter = painterResource(id = item.iconRes),
+                    painter = painterResource(id = item.iconResId),
                     contentDescription = item.title,
                     modifier = Modifier.size(48.dp),
                     contentScale = ContentScale.Fit

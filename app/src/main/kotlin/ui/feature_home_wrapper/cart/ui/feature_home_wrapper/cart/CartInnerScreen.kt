@@ -219,7 +219,7 @@ fun CartItemCard(
         ) {
             // Item image
             Image(
-                painter = painterResource(id = cartItem.item.iconRes),
+                painter = painterResource(id = cartItem.item.iconResId),
                 contentDescription = cartItem.item.title,
                 modifier = Modifier
                     .size(80.dp)

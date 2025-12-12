@@ -1,10 +1,16 @@
 package com.application.ui.feature_home_wrapper.cart.ui.feature_home_wrapper.cart
 
+import androidx.lifecycle.viewModelScope
 import com.application.MviViewModel
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
+import com.application.data.repository.CartRepository
 import com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.GamingTimeItem
+import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 data class CartItem(
     val item: GamingTimeItem,
@@ -15,41 +21,14 @@ data class CartItem(
 }
 
 data class CartInnerState(
-    val items: List<CartItem> = getDefaultCartItems()
+    val items: List<CartItem> = emptyList(),
+    val isLoading: Boolean = false
 ) : UiState {
     val totalPrice: Double
         get() = items.sumOf { it.totalPrice }
     
     val isEmpty: Boolean
         get() = items.isEmpty()
-}
-
-// Temporary default items for testing - in real app this would come from shared state/repository
-private fun getDefaultCartItems(): List<CartItem> {
-    return listOf(
-        CartItem(
-            item = GamingTimeItem(
-                id = "pc_1h",
-                title = "1 Hour PC",
-                description = "Standard PC station",
-                price = 3.0,
-                category = com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.ItemCategory.PC_TIME,
-                iconRes = com.application.R.mipmap.ic_monitor
-            ),
-            quantity = 1
-        ),
-        CartItem(
-            item = GamingTimeItem(
-                id = "cola",
-                title = "Cola",
-                description = "Cold soft drink",
-                price = 1.5,
-                category = com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.ItemCategory.DRINKS,
-                iconRes = com.application.R.mipmap.ic_cola
-            ),
-            quantity = 1
-        )
-    )
 }
 
 sealed class CartInnerEvent : UiEvent {
@@ -63,46 +42,53 @@ sealed class CartInnerEffect : UiEffect {
     object NavigateToOrderConfirmation : CartInnerEffect()
 }
 
-class CartInnerViewModel : MviViewModel<CartInnerEvent, CartInnerState, CartInnerEffect>() {
+@HiltViewModel
+class CartInnerViewModel @Inject constructor(
+    private val cartRepository: CartRepository
+) : MviViewModel<CartInnerEvent, CartInnerState, CartInnerEffect>() {
+    
+    init {
+        // Load cart items from database
+        viewModelScope.launch {
+            cartRepository.getAllCartItems()
+                .map { entities ->
+                    entities.map { entity ->
+                        CartItem(
+                            item = cartRepository.toItem(entity) as GamingTimeItem,
+                            quantity = entity.quantity
+                        )
+                    }
+                }
+                .collect { cartItems ->
+                    setState { copy(items = cartItems) }
+                }
+        }
+    }
+    
     override fun createInitialState(): CartInnerState = CartInnerState()
 
     override fun handleEvent(event: CartInnerEvent) {
         when (event) {
             is CartInnerEvent.OnIncreaseQuantity -> {
-                setState {
-                    copy(
-                        items = items.map { cartItem ->
-                            if (cartItem.item.id == event.itemId) {
-                                cartItem.copy(quantity = cartItem.quantity + 1)
-                            } else {
-                                cartItem
-                            }
-                        }
-                    )
+                viewModelScope.launch {
+                    val currentItem = viewState.value.items.find { it.item.id == event.itemId }
+                    if (currentItem != null) {
+                        cartRepository.updateItemQuantity(event.itemId, currentItem.quantity + 1)
+                    }
                 }
             }
             is CartInnerEvent.OnDecreaseQuantity -> {
-                setState {
-                    val updatedItems = items.map { cartItem ->
-                        if (cartItem.item.id == event.itemId) {
-                            val newQuantity = (cartItem.quantity - 1).coerceAtLeast(0)
-                            if (newQuantity > 0) {
-                                cartItem.copy(quantity = newQuantity)
-                            } else {
-                                null
-                            }
-                        } else {
-                            cartItem
-                        }
-                    }.filterNotNull()
-                    copy(items = updatedItems)
+                viewModelScope.launch {
+                    val currentItem = viewState.value.items.find { it.item.id == event.itemId }
+                    if (currentItem != null) {
+                        val newQuantity = (currentItem.quantity - 1).coerceAtLeast(0)
+                        cartRepository.updateItemQuantity(event.itemId, newQuantity)
+                    }
                 }
             }
             is CartInnerEvent.OnRemoveItem -> {
-                setState {
-                    copy(
-                        items = items.filter { it.item.id != event.itemId }
-                    )
+                viewModelScope.launch {
+                    cartRepository.removeItemFromCart(event.itemId)
                 }
             }
             is CartInnerEvent.OnConfirmOrder -> {

@@ -36,6 +36,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.application.R
 import com.application.navigation.HomeRoute
 import com.application.navigation.RootRoute
@@ -127,14 +128,14 @@ fun HomeWrapperScreen(
         ) {
             composable(HomeRoute.GamingTime.route) {
                 GamingTimeScreen(
-                    viewModel = viewModel(),
+                    viewModel = hiltViewModel(),
                     navController = homeNavController,
                     onMenuClick = { scope.launch { drawerState.open() } }
                 )
             }
             composable(HomeRoute.CartInner.route) {
                 CartInnerScreen(
-                    viewModel = viewModel(),
+                    viewModel = hiltViewModel(),
                     navController = homeNavController,
                     rootNavController = rootNavController,
                     onMenuClick = { scope.launch { drawerState.open() } }
