@@ -46,6 +46,7 @@ import com.application.ui.components.MenuButton
 import com.application.ui.components.topAppBarColors
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBackgroundMain
+import com.application.ui.theme.colorBlack
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorGreen
 import com.application.ui.theme.colorWhitePure
@@ -256,32 +257,29 @@ fun ItemCard(
             modifier = Modifier.fillMaxWidth(),
             verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            // Item image
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(120.dp)
-                    .clip(RoundedCornerShape(12.dp))
-                    .background(colorBluePrimary.copy(alpha = 0.1f)),
-                contentAlignment = Alignment.Center
+            // Title and Icon row
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
+                // Title on the left
+                Text(
+                    text = item.title,
+                    style = MaterialTheme.typography.titleMedium,
+                    color = colorWhitePure,
+                    maxLines = 1,
+                    modifier = Modifier.weight(1f)
+                )
+                
+                // Icon on the right
                 Image(
                     painter = painterResource(id = item.iconRes),
                     contentDescription = item.title,
-                    modifier = Modifier
-                        .size(80.dp)
-                        .padding(8.dp),
+                    modifier = Modifier.size(48.dp),
                     contentScale = ContentScale.Fit
                 )
             }
-
-            // Title
-            Text(
-                text = item.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = colorWhitePure,
-                maxLines = 1
-            )
 
             // Description
             Text(
@@ -299,37 +297,41 @@ fun ItemCard(
                 horizontalArrangement = Arrangement.SpaceBetween,
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(
-                    text = "$${String.format("%.2f", item.price)}",
-                    style = MaterialTheme.typography.titleMedium,
-                    color = colorWhitePure
-                )
-
+                // Price in green rectangle - black text, smaller size
                 Box(
                     modifier = Modifier
                         .clip(RoundedCornerShape(8.dp))
                         .background(colorGreen)
-                        .clickableNoRipple { onAddToCart() }
                         .padding(horizontal = 12.dp, vertical = 6.dp),
                     contentAlignment = Alignment.Center
                 ) {
-                    Row(
-                        horizontalArrangement = Arrangement.spacedBy(4.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Text(
-                            text = "Add to",
-                            style = MaterialTheme.typography.bodySmall,
-                            color = colorWhitePure
-                        )
-                        Image(
-                            painter = painterResource(id = R.drawable.ic_cart),
-                            contentDescription = null,
-                            modifier = Modifier.size(16.dp),
-                            contentScale = ContentScale.Fit,
-                            colorFilter = ColorFilter.tint(colorWhitePure)
-                        )
-                    }
+                    Text(
+                        text = "$${String.format("%.2f", item.price)}",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colorBlack
+                    )
+                }
+
+                // Add to cart button - transparent, blue text and icon
+                Row(
+                    modifier = Modifier
+                        .clickableNoRipple { onAddToCart() }
+                        .padding(horizontal = 12.dp, vertical = 6.dp),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Text(
+                        text = "Add to",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colorBluePrimary
+                    )
+                    Image(
+                        painter = painterResource(id = R.drawable.ic_cart),
+                        contentDescription = null,
+                        modifier = Modifier.size(16.dp),
+                        contentScale = ContentScale.Fit,
+                        colorFilter = ColorFilter.tint(colorBluePrimary)
+                    )
                 }
             }
         }
