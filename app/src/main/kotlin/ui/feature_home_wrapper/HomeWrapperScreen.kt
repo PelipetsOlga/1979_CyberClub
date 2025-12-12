@@ -136,6 +136,7 @@ fun HomeWrapperScreen(
                 CartInnerScreen(
                     viewModel = viewModel(),
                     navController = homeNavController,
+                    rootNavController = rootNavController,
                     onMenuClick = { scope.launch { drawerState.open() } }
                 )
             }
