@@ -284,7 +284,7 @@ fun ItemCard(
             // Description
             Text(
                 text = item.description,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.labelSmall,
                 color = colorWhitePure.copy(alpha = 0.7f),
                 maxLines = 2
             )
