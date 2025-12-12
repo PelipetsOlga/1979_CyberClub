@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import com.application.navigation.RootRoute
+import com.application.ui.components.PrimaryButton
 import com.application.ui.theme.colorBackgroundMain
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorRed
@@ -74,136 +75,127 @@ fun OrderConfirmationScreen(
                     color = colorRed,
                     style = MaterialTheme.typography.bodyLarge,
                     modifier = Modifier
-                        .align(Alignment.CenterStart)
+                        .align(Alignment.CenterEnd)
                         .clickableNoRipple { viewModel.setEvent(OrderConfirmationEvent.OnBackClicked) }
                 )
             }
         }
     ) { paddingValues ->
-        LazyColumn(
+        Column(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues)
-                .padding(horizontal = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            
-            // Title: Order Confirmed!
-            item {
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .background(
-                            color = colorBluePrimary,
-                            shape = RoundedCornerShape(16.dp)
-                        )
-                        .padding(vertical = 20.dp),
-                    contentAlignment = Alignment.Center
-                ) {
-                    Text(
-                        text = "Order Confirmed!",
-                        style = MaterialTheme.typography.headlineMedium,
-                        color = colorWhitePure,
-                        textAlign = TextAlign.Center
-                    )
+            // Scrollable content
+            LazyColumn(
+                modifier = Modifier
+                    .weight(1f)
+                    .padding(horizontal = 16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(24.dp)
+            ) {
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
-            }
-            
-            // Subtitle
-            item {
-                Text(
-                    text = "Show this QR code at the counter",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colorWhitePure,
-                    textAlign = TextAlign.Center
-                )
-            }
-            
-            // QR Code
-            item {
-                if (qrBitmap != null) {
+                
+                // Title: Order Confirmed!
+                item {
                     Box(
                         modifier = Modifier
-                            .size(280.dp)
+                            .fillMaxWidth()
                             .background(
-                                color = colorWhitePure,
+                                color = colorBluePrimary,
                                 shape = RoundedCornerShape(16.dp)
                             )
-                            .padding(16.dp),
+                            .padding(vertical = 20.dp),
                         contentAlignment = Alignment.Center
                     ) {
-                        Image(
-                            bitmap = qrBitmap.asImageBitmap(),
-                            contentDescription = "QR Code",
-                            modifier = Modifier.fillMaxSize(),
-                            contentScale = ContentScale.Fit
+                        Text(
+                            text = "Order Confirmed!",
+                            style = MaterialTheme.typography.headlineMedium,
+                            color = colorWhitePure,
+                            textAlign = TextAlign.Center
                         )
                     }
-                } else if (state.isLoading) {
-                    CircularProgressIndicator(
-                        modifier = Modifier.size(280.dp),
-                        color = colorWhitePure
-                    )
                 }
-            }
-            
-            // Order Number
-            item {
-                if (state.orderId.isNotEmpty()) {
+                
+                // Subtitle
+                item {
                     Text(
-                        text = "Order #${state.orderId}",
-                        style = MaterialTheme.typography.titleLarge,
+                        text = "Show this QR code at the counter",
+                        style = MaterialTheme.typography.bodyLarge,
                         color = colorWhitePure,
                         textAlign = TextAlign.Center
                     )
                 }
-            }
-            
-            // Items List
-            item {
-                if (state.items.isNotEmpty()) {
-                    Column(
-                        modifier = Modifier.fillMaxWidth(),
-                        verticalArrangement = Arrangement.spacedBy(12.dp)
-                    ) {
-                        state.items.forEach { orderItem ->
-                            OrderItemCard(orderItem = orderItem)
+                
+                // QR Code
+                item {
+                    if (qrBitmap != null) {
+                        Box(
+                            modifier = Modifier
+                                .size(280.dp)
+                                .background(
+                                    color = colorWhitePure,
+                                    shape = RoundedCornerShape(16.dp)
+                                )
+                                .padding(16.dp),
+                            contentAlignment = Alignment.Center
+                        ) {
+                            Image(
+                                bitmap = qrBitmap.asImageBitmap(),
+                                contentDescription = "QR Code",
+                                modifier = Modifier.fillMaxSize(),
+                                contentScale = ContentScale.Fit
+                            )
+                        }
+                    } else if (state.isLoading) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(280.dp),
+                            color = colorWhitePure
+                        )
+                    }
+                }
+                
+                // Order Number
+                item {
+                    if (state.orderId.isNotEmpty()) {
+                        Text(
+                            text = "Order #${state.orderId}",
+                            style = MaterialTheme.typography.titleLarge,
+                            color = colorWhitePure,
+                            textAlign = TextAlign.Center
+                        )
+                    }
+                }
+                
+                // Items List
+                item {
+                    if (state.items.isNotEmpty()) {
+                        Column(
+                            modifier = Modifier.fillMaxWidth(),
+                            verticalArrangement = Arrangement.spacedBy(12.dp)
+                        ) {
+                            state.items.forEach { orderItem ->
+                                OrderItemCard(orderItem = orderItem)
+                            }
                         }
                     }
                 }
-            }
-            
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
-            
-            // Back to Home Button
-            item {
-                Button(
-                    onClick = { viewModel.setEvent(OrderConfirmationEvent.OnBackToHomeClicked) },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    colors = ButtonDefaults.buttonColors(
-                        containerColor = colorBluePrimary
-                    ),
-                    shape = RoundedCornerShape(16.dp)
-                ) {
-                    Text(
-                        text = "Back to Home",
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
-                    )
+                
+                item {
+                    Spacer(modifier = Modifier.height(16.dp))
                 }
             }
             
-            item {
-                Spacer(modifier = Modifier.height(16.dp))
-            }
+            // Fixed button at bottom
+            PrimaryButton(
+                onClick = { viewModel.setEvent(OrderConfirmationEvent.OnBackToHomeClicked) },
+                text = "Back to Home",
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 16.dp, vertical = 16.dp)
+            )
         }
     }
 }
