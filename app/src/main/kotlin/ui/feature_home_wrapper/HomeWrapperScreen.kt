@@ -157,7 +157,16 @@ fun HomeWrapperScreen(
                 ClubInfoScreen(
                     viewModel = viewModel(),
                     navController = homeNavController,
-                    onMenuClick = { scope.launch { drawerState.open() } }
+                    onMenuClick = { scope.launch { drawerState.open() } },
+                    onBackToHome = {
+                        // Close HomeWrapperScreen and return to HomeScreen
+                        val poppedToHome = rootNavController.popBackStack(RootRoute.Home.route, false)
+                        if (!poppedToHome) {
+                            rootNavController.navigate(RootRoute.Home.route) {
+                                launchSingleTop = true
+                            }
+                        }
+                    }
                 )
             }
             composable(HomeRoute.Support.route) {
