@@ -99,7 +99,7 @@ fun ReservationQRScreen(
                     Spacer(modifier = Modifier.height(16.dp))
                 }
 
-                // Title: Reservation Confirmed!
+                // Title: Reservation Complete
                 item {
                     Box(
                         modifier = Modifier
@@ -112,7 +112,7 @@ fun ReservationQRScreen(
                         contentAlignment = Alignment.Center
                     ) {
                         Text(
-                            text = "Reservation Confirmed!",
+                            text = "Reservation Complete",
                             style = MaterialTheme.typography.headlineMedium,
                             color = colorWhitePure,
                             textAlign = TextAlign.Center
@@ -123,7 +123,7 @@ fun ReservationQRScreen(
                 // Subtitle
                 item {
                     Text(
-                        text = "Show this QR code at the counter",
+                        text = "Show this at the entrance",
                         style = MaterialTheme.typography.bodyLarge,
                         color = colorWhitePure,
                         textAlign = TextAlign.Center
@@ -204,33 +204,43 @@ fun ReservationDetailsCard(reservation: ReservationDetails) {
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(12.dp)
+        verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        ReservationDetailRow("Name", reservation.name)
-        ReservationDetailRow("Phone", reservation.phone)
-        ReservationDetailRow("Zone", reservation.zone)
-        ReservationDetailRow("Seat", reservation.seatNumber)
-        ReservationDetailRow("Date", reservation.date)
-        ReservationDetailRow("Time", reservation.time)
-    }
-}
-
-@Composable
-fun ReservationDetailRow(label: String, value: String) {
-    Row(
-        modifier = Modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.SpaceBetween
-    ) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = colorWhitePure.copy(alpha = 0.7f)
-        )
-        Text(
-            text = value,
-            style = MaterialTheme.typography.bodyMedium,
-            color = colorWhitePure
-        )
+        // Name and Date/Time row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = reservation.name,
+                style = MaterialTheme.typography.titleLarge,
+                color = colorWhitePure
+            )
+            Text(
+                text = reservation.formattedDateTime,
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorWhitePure
+            )
+        }
+        
+        // Zone and Seat row
+        Row(
+            modifier = Modifier.fillMaxWidth(),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                text = "Zone: ${reservation.zone}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorWhitePure
+            )
+            Text(
+                text = "Seat: ${reservation.seatNumber}",
+                style = MaterialTheme.typography.bodyMedium,
+                color = colorWhitePure
+            )
+        }
     }
 }
 

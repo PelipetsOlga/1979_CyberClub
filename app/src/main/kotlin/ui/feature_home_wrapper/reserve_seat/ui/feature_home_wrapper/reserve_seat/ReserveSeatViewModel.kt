@@ -71,6 +71,7 @@ sealed class ReserveSeatEvent : UiEvent {
     data class OnDateSelected(val date: String) : ReserveSeatEvent()
     data class OnTimeSelected(val time: String) : ReserveSeatEvent()
     object OnConfirmReservation : ReserveSeatEvent()
+    object OnClearForm : ReserveSeatEvent()
 }
 
 sealed class ReserveSeatEffect : UiEffect {
@@ -114,6 +115,9 @@ class ReserveSeatViewModel @Inject constructor(
                     confirmReservation()
                 }
             }
+            is ReserveSeatEvent.OnClearForm -> {
+                setState { createInitialState() }
+            }
         }
     }
 
@@ -140,7 +144,10 @@ class ReserveSeatViewModel @Inject constructor(
                 
                 reservationRepository.saveReservation(reservation)
                 
-                setState { copy(isLoading = false) }
+                // Очищаем форму после успешного сохранения
+                setState { 
+                    createInitialState().copy(isLoading = false)
+                }
                 setEffect { ReserveSeatEffect.NavigateToReservationQR(reservationId) }
             } catch (e: Exception) {
                 setState { 
