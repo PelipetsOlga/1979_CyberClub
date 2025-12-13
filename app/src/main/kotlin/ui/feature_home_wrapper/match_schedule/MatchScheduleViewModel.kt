@@ -1,6 +1,7 @@
 package com.application.ui.feature_home_wrapper.match_schedule
 
 import com.application.MviViewModel
+import com.application.R
 import com.application.UiEffect
 import com.application.UiEvent
 import com.application.UiState
@@ -27,12 +28,12 @@ private fun getHardcodedMatches(): List<Match> {
             teamA = Team(
                 id = "navi",
                 name = "NAVI",
-                logoResId = null // Will use placeholder
+                logoResId = R.mipmap.ic_icon1 // First match icon
             ),
             teamB = Team(
                 id = "g2",
                 name = "G2",
-                logoResId = null // Will use placeholder
+                logoResId = R.mipmap.ic_icon1 // First match icon
             ),
             tournamentName = "BLAST Premier Fall",
             stage = "Group Stage"
@@ -44,12 +45,12 @@ private fun getHardcodedMatches(): List<Match> {
             teamA = Team(
                 id = "fnatic",
                 name = "Fnatic",
-                logoResId = null // Will use placeholder
+                logoResId = R.mipmap.ic_icon2 // Second match icon
             ),
             teamB = Team(
                 id = "liquid",
                 name = "Liquid",
-                logoResId = null // Will use placeholder
+                logoResId = R.mipmap.ic_icon2 // Second match icon
             ),
             tournamentName = "BLAST Premier Fall",
             stage = "Playoffs"
