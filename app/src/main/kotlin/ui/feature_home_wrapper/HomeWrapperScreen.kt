@@ -44,7 +44,7 @@ import com.application.ui.feature_home_wrapper.cart.ui.feature_home_wrapper.cart
 import com.application.ui.feature_home_wrapper.club_info.ui.feature_home_wrapper.club_info.ClubInfoScreen
 import com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapper.gaming_time.GamingTimeScreen
 import com.application.ui.feature_home_wrapper.reserve_seat.ui.feature_home_wrapper.reserve_seat.ReserveSeatScreen
-import com.application.ui.feature_home_wrapper.schedule.ui.feature_home_wrapper.schedule.MatchScheduleScreen
+import com.application.ui.feature_home_wrapper.match_schedule.MatchScheduleScreen
 import com.application.ui.feature_home_wrapper.support.ui.feature_home_wrapper.support.SupportScreen
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBluePrimary
@@ -143,7 +143,7 @@ fun HomeWrapperScreen(
             }
             composable(HomeRoute.MatchSchedule.route) {
                 MatchScheduleScreen(
-                    viewModel = viewModel(),
+                    viewModel = hiltViewModel(),
                     navController = homeNavController,
                     onMenuClick = { scope.launch { drawerState.open() } }
                 )
