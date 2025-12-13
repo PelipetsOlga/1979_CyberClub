@@ -26,5 +26,6 @@ sealed class HomeRoute(val route: String) {
     object ReserveSeat : HomeRoute("reserve_seat")
     object ClubInfo : HomeRoute("club_info")
     object Support : HomeRoute("support")
+    object LiveClub : HomeRoute("live_club")
 }
 

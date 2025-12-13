@@ -46,6 +46,7 @@ import com.application.ui.feature_home_wrapper.gaming_time.ui.feature_home_wrapp
 import com.application.ui.feature_home_wrapper.reserve_seat.ui.feature_home_wrapper.reserve_seat.ReserveSeatScreen
 import com.application.ui.feature_home_wrapper.match_schedule.MatchScheduleScreen
 import com.application.ui.feature_home_wrapper.support.ui.feature_home_wrapper.support.SupportScreen
+import com.application.ui.feature_home_wrapper.live_club.LiveClubScreen
 import com.application.ui.theme.AppTheme
 import com.application.ui.theme.colorBluePrimary
 import com.application.ui.theme.colorSteelBlue
@@ -188,6 +189,13 @@ fun HomeWrapperScreen(
                     }
                 )
             }
+            composable(HomeRoute.LiveClub.route) {
+                LiveClubScreen(
+                    viewModel = hiltViewModel(),
+                    navController = homeNavController,
+                    onMenuClick = { scope.launch { drawerState.open() } }
+                )
+            }
         }
     }
 }
@@ -278,9 +286,9 @@ fun DrawerBody(
         // Live
         DrawerIconButton(
             iconRes = R.drawable.ic_live,
-            route = "", // No route for Live, can be customized
+            route = HomeRoute.LiveClub.route,
             currentRoute = currentRoute,
-            onClick = { /* Handle Live click */ }
+            onClick = { onItemClick(HomeRoute.LiveClub.route) }
         )
     }
 }
