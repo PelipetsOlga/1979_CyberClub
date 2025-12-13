@@ -17,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.application.navigation.HomeRoute
 import com.application.domain.model.ReservationHistoryItem
 import com.application.domain.model.OrderHistoryItem
 import com.application.domain.model.ReservationStatus
@@ -48,7 +49,13 @@ fun HistoryScreen(
         effect?.let {
             when (it) {
                 is HistoryEffect.NavigateBack -> {
-                    navController.popBackStack()
+                    // Navigate to GamingTime (default screen)
+                    navController.navigate(HomeRoute.GamingTime.route) {
+                        popUpTo(HomeRoute.GamingTime.route) {
+                            inclusive = true
+                        }
+                        launchSingleTop = true
+                    }
                 }
             }
         }
@@ -73,7 +80,14 @@ fun HistoryScreen(
                         style = MaterialTheme.typography.bodyLarge,
                         modifier = Modifier
                             .padding(horizontal = 16.dp)
-                            .clickableNoRipple { viewModel.setEvent(HistoryEvent.OnBackClicked) }
+                            .clickableNoRipple { 
+                                navController.navigate(HomeRoute.GamingTime.route) {
+                                    popUpTo(HomeRoute.GamingTime.route) {
+                                        inclusive = true
+                                    }
+                                    launchSingleTop = true
+                                }
+                            }
                     )
                 }
             )

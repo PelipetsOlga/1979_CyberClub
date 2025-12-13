@@ -84,8 +84,8 @@ class HistoryViewModel @Inject constructor(
                             }
                         }
                         .collect { reservationHistory ->
-                            setState { currentState ->
-                                currentState.copy(
+                            setState {
+                                copy(
                                     reservations = reservationHistory
                                 )
                             }
@@ -94,8 +94,8 @@ class HistoryViewModel @Inject constructor(
 
                 // Load orders (hardcoded for now, can be extended later)
                 val mockOrders = getMockOrders()
-                setState { currentState ->
-                    currentState.copy(
+                setState {
+                    copy(
                         orders = mockOrders,
                         isLoading = false
                     )
