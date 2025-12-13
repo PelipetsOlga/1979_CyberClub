@@ -168,7 +168,7 @@ fun LiveClubScreenContent(
                 modifier = Modifier
                     .fillMaxWidth()
                     .background(
-                        color = colorBackgroundMain.copy(alpha = 0.6f),
+                        color = androidx.compose.ui.graphics.Color(0xFF1A1A1A), // Темно-серый фон
                         shape = RoundedCornerShape(12.dp)
                     )
                     .padding(16.dp)
@@ -180,7 +180,7 @@ fun LiveClubScreenContent(
                             append("${clubStatus.estimatedWaitTimeMinutes} min")
                         }
                     },
-                    style = MaterialTheme.typography.bodyLarge,
+                    style = MaterialTheme.typography.titleMedium, // Увеличенный шрифт
                     color = colorWhitePure
                 )
             }
@@ -209,7 +209,7 @@ fun AvailabilityCard(
     Box(
         modifier = modifier
             .background(
-                color = colorBackgroundMain.copy(alpha = 0.6f),
+                color = androidx.compose.ui.graphics.Color(0xFF1A1A1A), // Темно-серый фон
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(16.dp),
@@ -221,12 +221,12 @@ fun AvailabilityCard(
         ) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.titleMedium, // Увеличенный шрифт
                 color = labelColor
             )
             Text(
                 text = value,
-                style = MaterialTheme.typography.headlineLarge,
+                style = MaterialTheme.typography.displaySmall, // Еще больше увеличенный шрифт
                 color = colorWhitePure,
                 fontWeight = FontWeight.Bold
             )
@@ -244,7 +244,7 @@ fun ZoneCard(
         modifier = modifier
             .aspectRatio(1f)
             .background(
-                color = colorBackgroundMain.copy(alpha = 0.6f),
+                color = androidx.compose.ui.graphics.Color(0xFF1A1A1A), // Темно-серый фон
                 shape = RoundedCornerShape(12.dp)
             )
             .padding(16.dp),
@@ -256,12 +256,12 @@ fun ZoneCard(
         ) {
             Text(
                 text = zoneName,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge, // Увеличенный шрифт
                 color = colorWhitePure
             )
             Text(
                 text = if (status == ZoneStatus.FREE) "Free" else "Busy",
-                style = MaterialTheme.typography.bodyLarge,
+                style = MaterialTheme.typography.titleMedium, // Увеличенный шрифт
                 color = if (status == ZoneStatus.FREE) colorGreen else colorRed,
                 fontWeight = FontWeight.Bold
             )
