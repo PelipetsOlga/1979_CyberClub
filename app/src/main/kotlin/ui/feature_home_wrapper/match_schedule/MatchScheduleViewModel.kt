@@ -61,9 +61,12 @@ private fun getHardcodedMatches(): List<Match> {
 sealed class MatchScheduleEvent : UiEvent {
     object OnScreenShown : MatchScheduleEvent()
     object OnRetry : MatchScheduleEvent()
+    object OnReserveSeatClicked : MatchScheduleEvent()
 }
 
-sealed class MatchScheduleEffect : UiEffect
+sealed class MatchScheduleEffect : UiEffect {
+    object NavigateToReserveSeat : MatchScheduleEffect()
+}
 
 @HiltViewModel
 class MatchScheduleViewModel @Inject constructor() : MviViewModel<MatchScheduleEvent, MatchScheduleState, MatchScheduleEffect>() {
@@ -77,6 +80,9 @@ class MatchScheduleViewModel @Inject constructor() : MviViewModel<MatchScheduleE
             }
             is MatchScheduleEvent.OnRetry -> {
                 // Data is hardcoded, no need to reload
+            }
+            is MatchScheduleEvent.OnReserveSeatClicked -> {
+                setEffect { MatchScheduleEffect.NavigateToReserveSeat }
             }
         }
     }

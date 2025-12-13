@@ -20,6 +20,7 @@ import com.application.ui.feature_home.HomeScreen
 import com.application.ui.feature_home_wrapper.HomeWrapperScreen
 import com.application.ui.feature_onboarding.OnboardingScreen
 import com.application.ui.feature_order_confirmation.OrderConfirmationScreen
+import com.application.ui.feature_reservation_qr.ReservationQRScreen
 import com.application.ui.feature_splash.SplashScreen
 import com.application.ui.theme.AppTheme
 import com.application.ui.utils.setUpEdgeToEdgeMode
@@ -84,6 +85,22 @@ class MainActivity : ComponentActivity() {
                             OrderConfirmationScreen(
                                 viewModel = hiltViewModel(),
                                 navController = rootNavController
+                            )
+                        }
+                        
+                        composable(
+                            route = RootRoute.ReservationQR.route,
+                            arguments = listOf(
+                                navArgument("reservationId") {
+                                    type = NavType.StringType
+                                }
+                            )
+                        ) { backStackEntry ->
+                            val reservationId = backStackEntry.arguments?.getString("reservationId") ?: ""
+                            ReservationQRScreen(
+                                viewModel = hiltViewModel(),
+                                navController = rootNavController,
+                                reservationId = reservationId
                             )
                         }
                     }

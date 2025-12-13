@@ -150,8 +150,9 @@ fun HomeWrapperScreen(
             }
             composable(HomeRoute.ReserveSeat.route) {
                 ReserveSeatScreen(
-                    viewModel = viewModel(),
+                    viewModel = hiltViewModel(),
                     navController = homeNavController,
+                    rootNavController = rootNavController,
                     onMenuClick = { scope.launch { drawerState.open() } }
                 )
             }
