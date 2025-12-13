@@ -17,6 +17,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -136,97 +137,47 @@ fun MatchCard(match: Match) {
                 )
             }
 
-            // Teams: Team A vs Team B
+            // Teams: Team A vs Team B - single line
             Row(
                 modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
+                horizontalArrangement = Arrangement.spacedBy(12.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                // Team A
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    // Team A Logo
-                    if (match.teamA.logoResId != null) {
-                        Image(
-                            painter = painterResource(id = match.teamA.logoResId),
-                            contentDescription = match.teamA.name,
-                            modifier = Modifier.size(48.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        // Placeholder if no logo
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(
-                                    color = colorBluePrimary.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = match.teamA.name.take(2).uppercase(),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = colorWhitePure
-                            )
-                        }
-                    }
-                    Text(
-                        text = match.teamA.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
+                // Team A Logo
+                if (match.teamA.logoResId != null) {
+                    Image(
+                        painter = painterResource(id = match.teamA.logoResId),
+                        contentDescription = match.teamA.name,
+                        modifier = Modifier.size(48.dp),
+                        contentScale = ContentScale.Fit
                     )
+                } else {
+                    // Placeholder if no logo
+                    Box(
+                        modifier = Modifier
+                            .size(48.dp)
+                            .background(
+                                color = colorBluePrimary.copy(alpha = 0.3f),
+                                shape = RoundedCornerShape(8.dp)
+                            ),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = match.teamA.name.take(2).uppercase(),
+                            style = MaterialTheme.typography.labelSmall,
+                            color = colorWhitePure
+                        )
+                    }
                 }
-
-                // VS
+                
+                // Combined text: "Team A vs Team B"
                 Text(
-                    text = "vs",
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colorWhitePure,
-                    modifier = Modifier.padding(horizontal = 16.dp)
+                    text = "${match.teamA.name} vs ${match.teamB.name}",
+                    style = MaterialTheme.typography.headlineMedium.copy(
+                        fontWeight = FontWeight.Bold
+                    ),
+                    color = colorWhitePure
                 )
-
-                // Team B
-                Row(
-                    horizontalArrangement = Arrangement.spacedBy(12.dp),
-                    verticalAlignment = Alignment.CenterVertically,
-                    modifier = Modifier.weight(1f)
-                ) {
-                    Text(
-                        text = match.teamB.name,
-                        style = MaterialTheme.typography.titleMedium,
-                        color = colorWhitePure
-                    )
-                    // Team B Logo
-                    if (match.teamB.logoResId != null) {
-                        Image(
-                            painter = painterResource(id = match.teamB.logoResId),
-                            contentDescription = match.teamB.name,
-                            modifier = Modifier.size(48.dp),
-                            contentScale = ContentScale.Fit
-                        )
-                    } else {
-                        // Placeholder if no logo
-                        Box(
-                            modifier = Modifier
-                                .size(48.dp)
-                                .background(
-                                    color = colorBluePrimary.copy(alpha = 0.3f),
-                                    shape = RoundedCornerShape(8.dp)
-                                ),
-                            contentAlignment = Alignment.Center
-                        ) {
-                            Text(
-                                text = match.teamB.name.take(2).uppercase(),
-                                style = MaterialTheme.typography.labelSmall,
-                                color = colorWhitePure
-                            )
-                        }
-                    }
-                }
             }
 
             // Tournament Name
