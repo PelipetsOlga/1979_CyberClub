@@ -38,9 +38,22 @@ fun MatchScheduleScreen(
     onMenuClick: () -> Unit = {}
 ) {
     val state by viewModel.viewState.collectAsStateWithLifecycle()
+    val effect by viewModel.effect.collectAsStateWithLifecycle(initialValue = null)
 
     LaunchedEffect(Unit) {
         viewModel.setEvent(MatchScheduleEvent.OnScreenShown)
+    }
+
+    LaunchedEffect(effect) {
+        effect?.let {
+            when (it) {
+                is MatchScheduleEffect.NavigateToReserveSeat -> {
+                    navController.navigate(com.application.navigation.HomeRoute.ReserveSeat.route) {
+                        launchSingleTop = true
+                    }
+                }
+            }
+        }
     }
 
     Scaffold(
@@ -56,6 +69,16 @@ fun MatchScheduleScreen(
                 },
                 navigationIcon = {
                     MenuButton(onMenuClick)
+                },
+                actions = {
+                    TextButton(
+                        onClick = { viewModel.setEvent(MatchScheduleEvent.OnReserveSeatClicked) }
+                    ) {
+                        Text(
+                            text = "Reserve",
+                            color = colorBluePrimary
+                        )
+                    }
                 }
             )
         }

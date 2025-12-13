@@ -11,6 +11,9 @@ sealed class RootRoute(val route: String) {
         fun createRoute(initialScreen: String) = "home_wrapper/$initialScreen"
     }
     object OrderConfirmation : RootRoute("order_confirmation")
+    object ReservationQR : RootRoute("reservation_qr/{reservationId}") {
+        fun createRoute(reservationId: String) = "reservation_qr/$reservationId"
+    }
 }
 
 /**
