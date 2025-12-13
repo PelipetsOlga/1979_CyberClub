@@ -6,6 +6,7 @@ import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.KeyboardArrowDown
@@ -87,127 +88,131 @@ fun ReserveSeatScreenContent(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .padding(16.dp),
-        verticalArrangement = Arrangement.spacedBy(24.dp)
+            .padding(16.dp)
     ) {
-        // Name field
-        ReservationTextField(
-            label = "Name",
-            value = state.name,
-            placeholder = "Enter your name",
-            onValueChange = { onEvent(ReserveSeatEvent.OnNameChanged(it)) }
-        )
-
-        // Phone field
-        ReservationTextField(
-            label = "Phone",
-            value = state.phone,
-            placeholder = "Enter your phone number",
-            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
-            onValueChange = { onEvent(ReserveSeatEvent.OnPhoneChanged(it)) }
-        )
-
-        // Zone dropdown
-        ReservationDropdownField(
-            label = "Zone",
-            selectedValue = state.selectedZone?.name ?: "",
-            placeholder = "Select zone",
-            options = Zone.values().map { it.name },
-            onValueSelected = { zoneName ->
-                onEvent(ReserveSeatEvent.OnZoneSelected(Zone.valueOf(zoneName)))
-            }
-        )
-
-        // Seat Number dropdown
-        ReservationDropdownField(
-            label = "Seat Number",
-            selectedValue = state.selectedSeatNumber,
-            placeholder = "Select seat",
-            options = state.availableSeats,
-            enabled = state.selectedZone != null,
-            onValueSelected = { seat ->
-                onEvent(ReserveSeatEvent.OnSeatNumberSelected(seat))
-            }
-        )
-
-        // Date selection
         Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
+            modifier = Modifier
+                .weight(1f)
+                .verticalScroll(rememberScrollState()),
+            verticalArrangement = Arrangement.spacedBy(24.dp)
         ) {
-            Text(
-                text = "Date",
-                style = MaterialTheme.typography.bodyMedium,
-                color = colorWhitePure
+            // Name field
+            ReservationTextField(
+                label = "Name",
+                value = state.name,
+                placeholder = "Enter your name",
+                onValueChange = { onEvent(ReserveSeatEvent.OnNameChanged(it)) }
             )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                state.availableDates.forEach { date ->
-                    DateButton(
-                        date = date,
-                        isSelected = state.selectedDate == date,
-                        onClick = { onEvent(ReserveSeatEvent.OnDateSelected(date)) }
-                    )
+
+            // Phone field
+            ReservationTextField(
+                label = "Phone",
+                value = state.phone,
+                placeholder = "Enter your phone number",
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Phone),
+                onValueChange = { onEvent(ReserveSeatEvent.OnPhoneChanged(it)) }
+            )
+
+            // Zone dropdown
+            ReservationDropdownField(
+                label = "Zone",
+                selectedValue = state.selectedZone?.name ?: "",
+                placeholder = "Select zone",
+                options = Zone.values().map { it.name },
+                onValueSelected = { zoneName ->
+                    onEvent(ReserveSeatEvent.OnZoneSelected(Zone.valueOf(zoneName)))
                 }
+            )
+
+            // Seat Number dropdown
+            ReservationDropdownField(
+                label = "Seat Number",
+                selectedValue = state.selectedSeatNumber,
+                placeholder = "Select seat",
+                options = state.availableSeats,
+                enabled = state.selectedZone != null,
+                onValueSelected = { seat ->
+                    onEvent(ReserveSeatEvent.OnSeatNumberSelected(seat))
+                }
+            )
+
+            // Date selection
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Date",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorWhitePure
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    state.availableDates.forEach { date ->
+                        DateButton(
+                            date = date,
+                            isSelected = state.selectedDate == date,
+                            onClick = { onEvent(ReserveSeatEvent.OnDateSelected(date)) }
+                        )
+                    }
+                }
+            }
+
+            // Time selection
+            Column(
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                Text(
+                    text = "Time",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = colorWhitePure
+                )
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .horizontalScroll(rememberScrollState()),
+                    horizontalArrangement = Arrangement.spacedBy(12.dp)
+                ) {
+                    state.availableTimes.forEach { time ->
+                        TimeButton(
+                            time = time,
+                            isSelected = state.selectedTime == time,
+                            onClick = { onEvent(ReserveSeatEvent.OnTimeSelected(time)) }
+                        )
+                    }
+                }
+            }
+
+            if (state.isLoading) {
+                CircularProgressIndicator(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .padding(16.dp),
+                    color = colorWhitePure
+                )
+            }
+
+            if (state.errorMessage != null) {
+                Text(
+                    text = state.errorMessage,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = MaterialTheme.colorScheme.error,
+                    modifier = Modifier.padding(horizontal = 16.dp)
+                )
             }
         }
 
-        // Time selection
-        Column(
-            verticalArrangement = Arrangement.spacedBy(8.dp)
-        ) {
-            Text(
-                text = "Time",
-                style = MaterialTheme.typography.bodyMedium,
-                color = colorWhitePure
-            )
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                state.availableTimes.forEach { time ->
-                    TimeButton(
-                        time = time,
-                        isSelected = state.selectedTime == time,
-                        onClick = { onEvent(ReserveSeatEvent.OnTimeSelected(time)) }
-                    )
-                }
-            }
-        }
-
-        Spacer(modifier = Modifier.weight(1f))
-
-        // Confirm Reservation button
+        // Confirm Reservation button - fixed at bottom
         PrimaryButton(
             onClick = { onEvent(ReserveSeatEvent.OnConfirmReservation) },
             text = "Confirm Reservation",
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(vertical = 16.dp)
+                .padding(top = 16.dp, bottom = 16.dp)
         )
-
-        if (state.isLoading) {
-            CircularProgressIndicator(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-                    .padding(16.dp),
-                color = colorWhitePure
-            )
-        }
-
-        if (state.errorMessage != null) {
-            Text(
-                text = state.errorMessage,
-                style = MaterialTheme.typography.bodySmall,
-                color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.padding(horizontal = 16.dp)
-            )
-        }
     }
 }
 
@@ -224,13 +229,14 @@ fun ReservationTextField(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colorWhitePure
+                color = colorWhitePure,
+                modifier = Modifier.width(100.dp)
             )
             OutlinedTextField(
                 value = value,
@@ -241,7 +247,7 @@ fun ReservationTextField(
                         color = colorWhitePure.copy(alpha = 0.5f)
                     )
                 },
-                modifier = Modifier.width(200.dp),
+                modifier = Modifier.weight(1f),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedTextColor = colorWhitePure,
                     unfocusedTextColor = colorWhitePure,
@@ -278,18 +284,19 @@ fun ReservationDropdownField(
     ) {
         Row(
             modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
+            horizontalArrangement = Arrangement.spacedBy(16.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             Text(
                 text = label,
                 style = MaterialTheme.typography.bodyMedium,
-                color = colorWhitePure
+                color = colorWhitePure,
+                modifier = Modifier.width(100.dp)
             )
-            Box {
+            Box(modifier = Modifier.weight(1f)) {
                 Row(
                     modifier = Modifier
-                        .width(200.dp)
+                        .fillMaxWidth()
                         .clip(RoundedCornerShape(8.dp))
                         .background(
                             if (enabled) colorBackgroundMain else colorBackgroundMain.copy(alpha = 0.5f)
@@ -319,7 +326,7 @@ fun ReservationDropdownField(
                     expanded = expanded,
                     onDismissRequest = { expanded = false },
                     modifier = Modifier
-                        .width(200.dp)
+                        .fillMaxWidth()
                         .background(colorBackgroundMain)
                 ) {
                     options.forEach { option ->
